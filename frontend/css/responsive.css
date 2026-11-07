@@ -1,0 +1,71 @@
+/* Adaptación a tablets y celulares */
+@media (max-width: 1024px) {
+  .grid--4, .shortcuts { grid-template-columns: repeat(2, 1fr); }
+  .grid--3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 820px) {
+  .nav-toggle { display: flex; }
+  .nav {
+    display: none; position: absolute; top: 100%; left: -1rem; right: -1rem;
+    flex-direction: column; align-items: stretch; background: var(--cream);
+    padding: .8rem 1rem 1rem; border-bottom: 1px solid var(--line); box-shadow: var(--shadow);
+  }
+  .nav.is-open { display: flex; }
+  .nav__link { padding: .8rem 1rem; }
+
+  .hero__inner, .detail, .ai-promo, .site-footer__inner { grid-template-columns: 1fr; }
+  .detail { gap: 1.5rem; }
+}
+
+@media (max-width: 560px) {
+  .grid--4, .grid--3, .shortcuts { grid-template-columns: 1fr; }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar .btn { margin-top: 0; }
+  .section__head { flex-direction: column; align-items: flex-start; gap: .3rem; }
+  .chat__head { flex-direction: column; }
+  .chat__log { max-height: calc(100vh - 420px); padding: .8rem; }
+  .msg { max-width: 96%; }
+  .hero__actions .btn { width: 100%; }
+}
+
+/* ===== Rediseño responsive ===== */
+@media (max-width: 1024px) {
+  .stats__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 820px) {
+  .hero__scene { width: min(360px, 90%); margin-bottom: 1.5rem; order: -1; }
+  .plate-explorer, .nutri__panel { grid-template-columns: 1fr; }
+  .plate-explorer__chart { width: min(340px, 100%); margin-inline: auto; }
+  .page-head__art { opacity: .35; }
+}
+@media (max-width: 560px) {
+  .stats__grid { gap: 0; }
+  .hero__scene { width: 86%; }
+  .float svg { width: 52px; height: 52px; }
+  .art-tile { min-width: 76px; padding: .6rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
+  .marquee__track { animation: none; }
+}
+
+@media (max-width: 820px) {
+  .site-header__right { gap: .3rem; }
+  .nav { top: 100%; }
+}
+
+/* ===== Rediseño 3 responsive ===== */
+@media (max-width: 820px) {
+  :root { --header-h: 84px; }
+  .nav { top: calc(100% + 10px); left: 0; right: 0; border-radius: 22px; background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); padding: .6rem; }
+  .glass { left: 0; top: auto; bottom: -2%; }
+  .bento { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 170px; }
+  .page-head::before { inset: 0 0 0 30%; opacity: .5; }
+  .chat-page { min-height: calc(100vh - 84px); }
+}
+@media (max-width: 560px) {
+  .bento { grid-auto-rows: 150px; gap: .7rem; }
+  .bento__item--xl .bento__cap b { font-size: 1.3rem; }
+  .shortcut__photo { aspect-ratio: 16 / 9; }
+}
