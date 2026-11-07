@@ -11,7 +11,7 @@ Plataforma web educativa para consultar alimentos y sus propiedades nutricionale
 | Frontend (HTML5 + CSS3 + JavaScript puro) | **Implementado.** Probado visualmente y con datos de ejemplo; **sin probar contra el backend real** (aún no existe). |
 | Backend (Java + Spring Boot) | **Pendiente.** Solo existe la estructura de carpetas. |
 | Base de datos relacional (PostgreSQL) | **Pendiente.** Solo existe la estructura de carpetas. |
-| Base de datos vectorial (pgvector) | **Pendiente.** Solo existe la estructura de carpetas. |
+| Base de datos vectorial (Qdrant) | **Pendiente.** Solo existe la estructura de carpetas. |
 | Sistema RAG (embeddings + modelo de lenguaje) | **Pendiente.** Solo existe la estructura de carpetas. |
 | Auditoría e integración | **Pendiente.** No se han ejecutado pruebas de integración. |
 
@@ -21,7 +21,7 @@ Las carpetas vacías solo definen la estructura acordada; no representan funcion
 
 - **Frontend:** HTML5, CSS3 y JavaScript puro (Fetch API). Sin React, Angular, Vue, Bootstrap, Tailwind ni jQuery.
 - **Backend:** Java con Spring Boot.
-- **Bases de datos:** PostgreSQL con la extensión pgvector.
+- **Bases de datos:** PostgreSQL (datos relacionales) y Qdrant (base de datos vectorial).
 - **Inteligencia artificial:** modelo de embeddings, modelo de lenguaje y arquitectura RAG.
 
 ## Arquitectura de carpetas
@@ -48,14 +48,14 @@ IA2/
 │       │   │   ├── entity/        Entidades JPA
 │       │   │   ├── exception/     Excepciones propias y manejo global de errores
 │       │   │   ├── mapper/        Conversión entidad ↔ DTO
-│       │   │   ├── repository/    Acceso a datos (PostgreSQL y consultas vectoriales)
+│       │   │   ├── repository/    Acceso a datos relacionales (PostgreSQL)
 │       │   │   ├── service/       Lógica de negocio (interfaces)
 │       │   │   │   └── impl/      Implementaciones
 │       │   │   ├── rag/           Núcleo del sistema RAG
 │       │   │   │   ├── ingestion/   Carga de documentos y extracción de texto
 │       │   │   │   ├── chunking/    División en fragmentos
 │       │   │   │   ├── embedding/   Generación de embeddings
-│       │   │   │   ├── retrieval/   Búsqueda semántica en pgvector
+│       │   │   │   ├── retrieval/   Búsqueda semántica en Qdrant
 │       │   │   │   ├── prompt/      Construcción del contexto y las instrucciones
 │       │   │   │   └── generation/  Llamada al modelo de lenguaje
 │       │   │   ├── security/      Validación de archivos y entradas, sanitización
@@ -67,7 +67,7 @@ IA2/
 │           ├── controller/ · service/ · repository/ · rag/
 │
 ├── database/                     ⏳ Recursos de base de datos
-│   ├── init/                     Inicialización (extensión pgvector, usuarios, etc.)
+│   ├── init/                     Inicialización de PostgreSQL (usuarios, esquema base, etc.)
 │   └── seeds/                    Datos iniciales de ejemplo
 │
 ├── data/
@@ -86,7 +86,7 @@ Leyenda: ✅ existe y tiene contenido · ⏳ solo estructura, sin contenido toda
 
 1. **controller** recibe las peticiones HTTP, valida la entrada y delega; no contiene lógica de negocio.
 2. **service** implementa la lógica de negocio y orquesta repositorios y el módulo RAG.
-3. **repository** es la única capa que habla con PostgreSQL/pgvector.
+3. **repository** es la única capa que habla con PostgreSQL. El acceso a Qdrant (indexación y búsqueda de vectores) queda dentro del módulo **rag**.
 4. **rag** encapsula el flujo: ingestión → fragmentación → embeddings → recuperación → prompt → generación.
 5. **dto / mapper** separan el contrato público de las entidades internas.
 6. **exception** y **security** centralizan los errores y las validaciones.
@@ -136,6 +136,6 @@ Abre http://localhost:5500. Mientras no exista el backend, puedes poner `USE_MOC
 
 ## Pendiente
 
-- Implementar el backend, el esquema de PostgreSQL con pgvector y el flujo RAG completo.
+- Implementar el backend, el esquema de PostgreSQL, la colección de Qdrant y el flujo RAG completo.
 - Definir y documentar las herramientas de construcción y migraciones del backend.
 - Probar la integración frontend ↔ backend y registrar los resultados en `docs/auditoria/`.
