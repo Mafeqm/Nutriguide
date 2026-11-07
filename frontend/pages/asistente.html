@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1f6f4a">
+  <script>try{var t=JSON.parse(localStorage.getItem('ng:theme'));document.documentElement.dataset.theme=t||'light'}catch(e){document.documentElement.dataset.theme='light'}</script>
+  <title>Asistente NutriGuide AI · NutriGuide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body data-root="../" data-page="asistente">
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header id="site-header"></header>
+
+  <main id="contenido" class="chat-page">
+    <div class="container chat">
+      <div class="chat__head">
+        <div>
+          <h1>NutriGuide AI</h1>
+          <p class="muted">Respuestas educativas basadas en los documentos de la plataforma.</p>
+        </div>
+        <button id="chat-clear" class="btn btn--ghost btn--sm" type="button">Limpiar conversación</button>
+      </div>
+
+      <div id="chat-log" class="chat__log" role="log" aria-live="polite" aria-label="Conversación con el asistente" tabindex="0"></div>
+
+      <div id="chat-suggestions" class="chips chips--suggest" role="group" aria-label="Preguntas sugeridas">
+        <button type="button" class="chip" data-q="¿Qué nutrientes contiene la avena?">¿Qué nutrientes contiene la avena?</button>
+        <button type="button" class="chip" data-q="¿Qué alimentos son fuentes de proteínas?">Fuentes de proteínas</button>
+        <button type="button" class="chip" data-q="¿Cuál es la diferencia entre carbohidratos y proteínas?">Carbohidratos vs. proteínas</button>
+        <button type="button" class="chip" data-q="¿Qué alimentos contienen vitamina C?">Alimentos con vitamina C</button>
+        <button type="button" class="chip" data-q="¿Qué puedo preparar con arroz y verduras?">Qué preparar con arroz y verduras</button>
+      </div>
+
+      <form id="chat-form" class="chat__form" novalidate>
+        <label for="chat-input" class="sr-only">Escribe tu pregunta sobre alimentación</label>
+        <textarea id="chat-input" rows="1" placeholder="Escribe tu pregunta sobre alimentación…" aria-describedby="chat-hint"></textarea>
+        <button id="chat-send" class="btn btn--primary btn--icon" type="submit" aria-label="Enviar pregunta"></button>
+        <button id="chat-stop" class="btn btn--ghost btn--icon" type="button" aria-label="Detener respuesta" hidden></button>
+        <div class="chat__meta">
+          <span id="chat-hint" class="field__error" role="alert"></span>
+          <span id="chat-counter" class="muted small"></span>
+        </div>
+      </form>
+      <p class="muted small chat__disclaimer">NutriGuide AI es informativo y no sustituye la orientación de un profesional de la salud.</p>
+    </div>
+  </main>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script type="module" src="../js/asistente.js"></script>
+</body>
+</html>
