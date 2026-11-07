@@ -1,0 +1,10 @@
+{
+  "name": "nutriguide-frontend",
+  "private": true,
+  "type": "module",
+  "description": "Frontend estático (HTML/CSS/JS puro). package.json solo declara el script de pruebas; no hay dependencias.",
+  "scripts": {
+    "start": "python -m http.server 5500",
+    "test": "node --test"
+  }
+}
