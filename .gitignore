@@ -1,0 +1,34 @@
+# Compilación de Maven y Java
+target/
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Archivos de configuración con credenciales y variables de entorno
+.env
+backend/.env
+application-local.properties
+backend/src/main/resources/application-local.properties
+
+# Almacenamiento local de archivos subidos en ejecución
+uploads/
+backend/uploads/
+
+# IDEs y editores
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+

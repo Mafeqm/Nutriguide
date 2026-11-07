@@ -1,0 +1,25 @@
+TÍTULO: Guía Educativa sobre Cereales Integrales, Avena, Quinua y Fibra Dietética
+FUENTE DE ORIGEN: Organización de las Naciones Unidas para la Alimentación y la Agricultura (FAO) y USDA FoodData Central
+CATEGORÍA: Cereales y Carbohidratos Complejos
+
+1. ¿QUÉ SON LOS CEREALES INTEGRALES Y POR QUÉ SON IMPORTANTES?
+De acuerdo con la Organización de las Naciones Unidas para la Alimentación y la Agricultura (FAO), los cereales de grano entero o integrales conservan las tres partes anatómicas del grano: el salvado (capa externa rica en fibra dietética, vitaminas del complejo B y minerales), el endospermo (compuesto principalmente por almidón y proteínas de reserva) y el germen (embrión rico en lípidos insaturados, vitamina E y antioxidantes). A diferencia de los cereales refinados, los granos enteros aportan carbohidratos complejos de absorción más gradual y mayor densidad de micronutrientes.
+
+2. COMPOSICIÓN NUTRICIONAL Y BENEFICIOS DE LA AVENA (Avena sativa)
+Según los datos oficiales de composición de alimentos del Departamento de Agricultura de los Estados Unidos (USDA FoodData Central, FDC ID: 173904), por cada 100 gramos de avena en hojuelas de grano entero cruda se encuentran los siguientes nutrientes:
+- Energía: 389 kcal por cada 100 gramos.
+- Proteínas: 16.89 gramos por cada 100 gramos, una proporción superior a la de la mayoría de los cereales comunes, destacando su contenido de globulinas (avenalinas).
+- Carbohidratos totales: 66.27 gramos por cada 100 gramos, predominantemente almidón de digestión lenta.
+- Fibra dietética total: 10.60 gramos por cada 100 gramos.
+- Grasas totales: 6.90 gramos por cada 100 gramos, compuestas mayoritariamente por ácidos grasos insaturados (ácido oleico y ácido linoleico).
+- Minerales y vitaminas relevantes: La avena aporta manganeso, fósforo, magnesio (177 mg por 100 g), hierro (4.72 mg por 100 g), zinc (3.97 mg por 100 g) y tiamina (vitamina B1).
+
+3. EL PAPEL DEL BETAGLUCANO EN LA AVENA
+El componente funcional más estudiado de la avena es el betaglucano, un polisacárido de fibra soluble que representa entre el 4% y el 5.5% del peso seco del grano integral. Al hidratarse durante la cocción o la digestión, el betaglucano forma un gel viscoso en el tracto gastrointestinal. Esta propiedad fisiológica contribuye a:
+- Modular la velocidad de vaciamiento gástrico y prolongar la sensación de saciedad.
+- Atenuar la respuesta glucémica posprandial (evitando picos bruscos de glucosa en sangre después de las comidas).
+- Disminuir la reabsorción intestinal de ácidos biliares, lo cual contribuye al mantenimiento de niveles normales de colesterol LDL en sangre dentro de una alimentación equilibrada.
+
+4. LA QUINUA (Chenopodium quinoa) COMO PSEUDOCEREAL ANDINO
+La FAO reconoce a la quinua como un pseudocereal ancestral de alto valor nutricional. Por cada 100 gramos de quinua cruda (USDA FDC ID: 168874), aporta 368 kcal, 14.12 gramos de proteínas, 64.16 gramos de carbohidratos, 6.07 gramos de grasas insaturadas y 7.00 gramos de fibra dietética. Su característica distintiva es que contiene los nueve aminoácidos esenciales para el ser humano (incluyendo lisina y metionina, que suelen ser limitantes en cereales y legumbres respectivamente), además de ser libre de gluten por naturaleza. Antes de su cocción, se recomienda lavar los granos de quinua con agua para retirar las saponinas presentes en el pericarpio, las cuales tienen sabor amargo y pueden reducir la palatabilidad.
+

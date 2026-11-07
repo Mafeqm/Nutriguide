@@ -1,0 +1,20 @@
+TÍTULO: Guía Educativa sobre Proteínas, Leguminosas y Biodisponibilidad del Hierro
+FUENTE DE ORIGEN: Organización Mundial de la Salud (OMS), FAO e Instituto Colombiano de Bienestar Familiar (ICBF - GABA)
+CATEGORÍA: Proteínas y Leguminosas
+
+1. FUNCIÓN BIOLÓGICA DE LAS PROTEÍNAS Y LOS AMINOÁCIDOS ESENCIALES
+Según los informes conjuntos de expertos de la OMS y la FAO sobre requerimientos de proteínas y aminoácidos en la nutrición humana, las proteínas son macromoléculas formadas por cadenas de aminoácidos que cumplen funciones estructurales (músculos, hueso, piel, colágeno), enzimáticas, hormonales, de transporte (como la hemoglobina) e inmunológicas (anticuerpos). De los 20 aminoácidos que conforman las proteínas humanas, nueve se consideran aminoácidos esenciales (histidina, isoleucina, leucina, lisina, metionina, fenilalanina, treonina, triptófano y valina) porque el organismo no puede sintetizarlos y debe obtenerlos a través de la alimentación diaria.
+
+2. PROTEÍNAS DE ORIGEN ANIMAL Y DE ORIGEN VEGETAL
+- Fuentes de proteína animal de alto valor biológico: incluyen el huevo de gallina (12.58 g de proteína por 100 g cocido), la pechuga de pollo sin piel (31.02 g de proteína por 100 g cocida), los pescados como el salmón (22.10 g de proteína por 100 g cocido) y los lácteos fermentados como el yogur griego natural descremado (10.19 g de proteína por 100 g). Estos alimentos contienen todos los aminoácidos esenciales en proporciones de alta digestibilidad.
+- Fuentes de proteína vegetal (leguminosas y semillas): las lentejas secas aportan 24.63 g de proteína y 10.70 g de fibra por cada 100 g en crudo, mientras que los garbanzos secos aportan 20.47 g de proteína y 12.20 g de fibra por cada 100 g en crudo. Asimismo, los frutos secos como las almendras aportan 21.15 g de proteína vegetal por cada 100 g.
+
+3. COMPLEMENTACIÓN PROTEICA VEGETAL (CEREALES + LEGUMINOSAS)
+Las Guías Alimentarias Basadas en Alimentos (GABA) de la FAO y del ICBF explican que las leguminosas (lentejas, frijoles, garbanzos, arvejas) tienen un alto contenido del aminoácido lisina, pero menor proporción de metionina. Por el contrario, los cereales (arroz, maíz, avena, trigo) contienen suficiente metionina pero son limitantes en lisina. Cuando se consumen leguminosas y cereales a lo largo del mismo día o en una misma comida, sus perfiles de aminoácidos se complementan mutuamente, formando una proteína completa de excelente calidad biológica comparable a la proteína animal, con el beneficio adicional de aportar fibra dietética y cero colesterol.
+
+4. HIERRO HEMO, HIERRO NO HEMO Y FACTORES QUE MEJORAN SU ABSORCIÓN
+El hierro es un mineral esencial para la síntesis de hemoglobina y el transporte de oxígeno.En los alimentos se presenta en dos formas químicas:
+- Hierro hemo: presente en alimentos de origen animal (carnes, aves y pescados), con una tasa de absorción intestinal alta (entre 15% y 35%).
+- Hierro no hemo: presente en alimentos vegetales como las lentejas, los garbanzos, la quinua y la espinaca, así como en el huevo, con una absorción más variable (entre 2% y 20%).
+Para optimizar significativamente la absorción del hierro no hemo de las leguminosas y hojas verdes, la OMS y el ICBF recomiendan acompañarlos en la misma comida con alimentos ricos en vitamina C (ácido ascórbico), como jugo de limón fresco, guayaba, naranja, mandarina, pimentón o brócoli, ya que la vitamina C reduce el hierro férrico a hierro ferroso, facilitando su absorción intestinal. Por el contrario, se aconseja evitar el consumo simultáneo de café, té negro o infusiones ricas en taninos y fitatos inmediatamente junto con las comidas principales ricas en hierro vegetal, pues disminuyen su biodisponibilidad.
+

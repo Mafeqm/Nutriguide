@@ -1,0 +1,26 @@
+services:
+  nutriguide-postgres:
+    image: pgvector/pgvector:pg16
+    container_name: nutriguide-pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-nutriguide_db}
+      POSTGRES_USER: ${DB_USERNAME:-nutriguide}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-nutriguide_dev_pass}
+    ports:
+      # Se expone en el puerto 5433 del host por defecto para no entrar en conflicto
+      # con instalaciones locales de PostgreSQL en Windows que usan el puerto 5432.
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - nutriguide_pgdata:/var/lib/postgresql/data
+      - ./sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./sql/02_seed_data.sql:/docker-entrypoint-initdb.d/02_seed_data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-nutriguide} -d ${DB_NAME:-nutriguide_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  nutriguide_pgdata:
+
