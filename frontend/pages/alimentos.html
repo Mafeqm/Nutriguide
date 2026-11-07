@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1f6f4a">
+  <script>try{var t=JSON.parse(localStorage.getItem('ng:theme'));document.documentElement.dataset.theme=t||'light'}catch(e){document.documentElement.dataset.theme='light'}</script>
+  <title>Alimentos · NutriGuide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body data-root="../" data-page="alimentos">
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header id="site-header"></header>
+
+  <main id="contenido">
+    <section class="page-head" data-arts="apple,carrot,broccoli" style="--ph-img:url('../assets/images/verduras-variadas.jpg')">
+      <div class="container">
+        <h1>Catálogo de alimentos</h1>
+        <p class="lead">Busca por nombre o filtra por categoría para conocer su información nutricional.</p>
+      </div>
+    </section>
+
+    <section class="section section--tight">
+      <div class="container">
+        <form id="food-form" class="toolbar" role="search" novalidate>
+          <div class="field">
+            <label for="food-search">Buscar alimento</label>
+            <input id="food-search" type="search" name="nombre" placeholder="Ej.: avena, manzana…" autocomplete="off" aria-describedby="food-search-error">
+            <p id="food-search-error" class="field__error" role="alert"></p>
+          </div>
+          <button class="btn btn--primary" type="submit">Buscar</button>
+        </form>
+        <div class="filters">
+          <div class="field field--inline">
+            <label for="food-sort">Ordenar por</label>
+            <select id="food-sort">
+              <option value="nombre">Nombre (A–Z)</option>
+              <option value="calorias-asc">Menos calorías</option>
+              <option value="proteinas-desc">Más proteínas</option>
+            </select>
+          </div>
+          <label class="switch"><input type="checkbox" id="food-fav"><span>Solo favoritos</span></label>
+        </div>
+        <div id="food-categories" class="chips" role="group" aria-label="Filtrar por categoría"></div>
+        <p id="food-count" class="muted small" aria-live="polite"></p>
+        <div id="food-grid" class="grid grid--4" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script type="module" src="../js/alimentos.js"></script>
+</body>
+</html>
