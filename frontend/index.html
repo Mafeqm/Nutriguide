@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1f6f4a">
+  <script>try{var t=JSON.parse(localStorage.getItem('ng:theme'));document.documentElement.dataset.theme=t||'light'}catch(e){document.documentElement.dataset.theme='light'}</script>
+  <title>NutriGuide · Asistente inteligente de alimentación</title>
+  <meta name="description" content="Consulta alimentos, recetas y recursos educativos, y pregunta a un asistente de IA sobre alimentación saludable.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body data-root="" data-page="home">
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header id="site-header"></header>
+
+  <main id="contenido">
+    <!-- HÉROE -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <div class="hero__text">
+          <p class="eyebrow">Alimentación saludable, explicada</p>
+          <h1>Come con <em>criterio</em>, aprende con <em>confianza</em>.</h1>
+          <p class="lead">NutriGuide reúne alimentos, recetas y recursos educativos, y te permite resolver dudas con un asistente de IA que responde citando sus fuentes.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary btn--lg" href="pages/asistente.html">Preguntar al asistente</a>
+            <a class="btn btn--ghost btn--lg" href="pages/alimentos.html">Explorar alimentos</a>
+          </div>
+          <p class="hero__hint">Toca los alimentos para descubrir un dato →</p>
+        </div>
+
+        <div class="hero__scene" id="hero-scene">
+          <div class="scene__blob" aria-hidden="true"></div>
+          <div class="scene__photo"><img src="assets/images/hero-bowl.jpg" alt="Bowl de ensalada con tomate cherry, garbanzos, aguacate, camote y hojas verdes" width="900" height="600" fetchpriority="high"></div>
+          <div class="glass" aria-hidden="true"><span class="glass__dot"></span><span><b>IA con fuentes</b><small>Respuestas verificables</small></span></div>
+          <button type="button" class="float f1" data-art="apple" data-size="78" data-depth="38" data-fact="Manzana: aporta fibra y vitamina C, ideal como colación." aria-label="Manzana: ver dato"></button>
+          <button type="button" class="float f2" data-art="carrot" data-size="74" data-depth="-30" data-fact="Zanahoria: rica en betacarotenos, que el cuerpo convierte en vitamina A." aria-label="Zanahoria: ver dato"></button>
+          <button type="button" class="float f3" data-art="broccoli" data-size="82" data-depth="44" data-fact="Brócoli: fuente de vitamina C, vitamina K y fibra." aria-label="Brócoli: ver dato"></button>
+          <button type="button" class="float f4" data-art="orange" data-size="70" data-depth="-42" data-fact="Naranja: una de las frutas más conocidas por su vitamina C." aria-label="Naranja: ver dato"></button>
+          <button type="button" class="float f5" data-art="drop" data-size="60" data-depth="26" data-fact="Agua: el cuerpo adulto es aproximadamente un 60 % agua." aria-label="Agua: ver dato"></button>
+          <button type="button" class="float f7" data-art="tomato" data-size="66" data-depth="34" data-fact="Tomate: contiene licopeno y vitamina C." aria-label="Tomate: ver dato"></button>
+          <p id="hero-fact" class="hero__fact" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CINTA -->
+    <div class="marquee" aria-label="Grupos de alimentos">
+      <ul id="marquee-track" class="marquee__track"></ul>
+    </div>
+
+    <!-- CIFRAS -->
+    <section class="stats reveal" aria-label="Datos de referencia">
+      <div class="container stats__grid">
+        <div class="stat"><strong><span data-count="400">0</span> g</strong><span>de frutas y verduras al día recomendados por la OMS</span></div>
+        <div class="stat"><strong><span data-count="60">0</span> %</strong><span>del cuerpo adulto es agua, aproximadamente</span></div>
+        <div class="stat"><strong><span data-count="4">0</span> kcal</strong><span>por gramo de carbohidratos o proteínas</span></div>
+        <div class="stat"><strong><span data-count="9">0</span> kcal</strong><span>por gramo de grasa</span></div>
+      </div>
+    </section>
+
+    <!-- ATAJOS -->
+    <section class="section reveal" aria-labelledby="atajos-title">
+      <div class="container">
+        <h2 id="atajos-title" class="section__title">¿Qué quieres hacer hoy?</h2>
+        <div class="shortcuts">
+          <a class="shortcut" href="pages/alimentos.html"><span class="shortcut__photo"><img src="assets/images/frutas.jpg" alt="" loading="lazy" width="900" height="600"><span class="shortcut__art" data-art="apple" data-size="34"></span></span><h3>Catálogo de alimentos</h3><p>Valores nutricionales de cada alimento.</p></a>
+          <a class="shortcut" href="pages/recetas.html"><span class="shortcut__photo"><img src="assets/images/bowl-proteico.jpg" alt="" loading="lazy" width="900" height="600"><span class="shortcut__art" data-art="tomato" data-size="34"></span></span><h3>Recetas</h3><p>Ingredientes y pasos para cocinar mejor.</p></a>
+          <a class="shortcut" href="pages/biblioteca.html"><span class="shortcut__photo"><img src="assets/images/arandanos.jpg" alt="" loading="lazy" width="900" height="600"><span class="shortcut__art" data-art="wheat" data-size="34"></span></span><h3>Biblioteca</h3><p>Guías sobre nutrientes, hidratación y hábitos.</p></a>
+          <a class="shortcut" href="pages/asistente.html"><span class="shortcut__photo"><img src="assets/images/legumbres.jpg" alt="" loading="lazy" width="900" height="600"><span class="shortcut__art" data-art="avocado" data-size="34"></span></span><h3>Asistente IA</h3><p>Pregunta y recibe respuestas con fuentes.</p></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALERÍA -->
+    <section class="section reveal" aria-labelledby="galeria-title">
+      <div class="container">
+        <div class="section__intro">
+          <p class="eyebrow">Inspiración</p>
+          <h2 id="galeria-title">Come de todo el arcoíris</h2>
+          <p class="lead">Más colores en el plato significan más variedad de nutrientes. Explora cada grupo.</p>
+        </div>
+        <div class="bento">
+          <a class="bento__item bento__item--xl" href="pages/alimentos.html?cat=Verduras"><img src="assets/images/verduras-variadas.jpg" alt="Bandejas con verduras, legumbres y aderezos de muchos colores" loading="lazy" width="900" height="600"><span class="bento__cap"><b>Verduras</b><small>Fibra, vitaminas y minerales</small></span></a>
+          <a class="bento__item" href="pages/alimentos.html?cat=Frutas"><img src="assets/images/frutas.jpg" alt="Plato de frutas variadas" loading="lazy" width="900" height="600"><span class="bento__cap"><b>Frutas</b><small>Vitamina C y fibra</small></span></a>
+          <a class="bento__item bento__item--tall" href="pages/alimentos.html?cat=Legumbres"><img src="assets/images/legumbres.jpg" alt="Bowl con garbanzos, edamame y verduras" loading="lazy" width="900" height="1125"><span class="bento__cap"><b>Legumbres</b><small>Proteína vegetal</small></span></a>
+          <a class="bento__item" href="pages/biblioteca.html"><img src="assets/images/arandanos.jpg" alt="Tazón con arándanos" loading="lazy" width="900" height="600"><span class="bento__cap"><b>Frutos rojos</b><small>Antioxidantes</small></span></a>
+          <a class="bento__item bento__item--wide" href="pages/recetas.html"><img src="assets/images/bowl-proteico.jpg" alt="Bowl con tofu, maíz, edamame y repollo morado" loading="lazy" width="900" height="900"><span class="bento__cap"><b>Bowls completos</b><small>Ideas de recetas equilibradas</small></span></a>
+          <a class="bento__item bento__item--wide" href="pages/asistente.html"><img src="assets/images/desayuno-saludable.jpg" alt="Plato con huevo, aguacate, tomate y vegetales sobre una mesa de madera" loading="lazy" width="900" height="612"><span class="bento__cap"><b>¿Dudas?</b><small>Pregúntale al asistente</small></span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLATO INTERACTIVO -->
+    <section class="section section--tint reveal" aria-labelledby="plato-title">
+      <div class="container">
+        <div class="section__intro">
+          <p class="eyebrow">Interactivo</p>
+          <h2 id="plato-title">Arma tu plato equilibrado</h2>
+          <p class="lead">Pasa el cursor o toca cada porción para ver qué aporta y qué alimentos incluye.</p>
+        </div>
+        <div class="plate-explorer">
+          <div class="plate-explorer__chart" id="plate-chart">
+            <div class="donut__center" aria-hidden="true"><strong id="plate-center-pct">35%</strong><span id="plate-center-label">Verduras</span></div>
+          </div>
+          <div class="plate-explorer__side">
+            <div id="plate-legend" class="legend" role="group" aria-label="Porciones del plato"></div>
+            <div id="plate-panel" class="info-panel" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NUTRIENTES -->
+    <section class="section reveal" aria-labelledby="nutri-title">
+      <div class="container">
+        <div class="section__intro">
+          <p class="eyebrow">Aprende</p>
+          <h2 id="nutri-title">Conoce los nutrientes</h2>
+        </div>
+        <div class="nutri">
+          <div id="nutri-tabs" class="tabs" role="tablist" aria-label="Tipos de nutrientes"></div>
+          <div id="nutri-panel" class="nutri__panel" role="tabpanel" tabindex="0"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DESTACADOS -->
+    <section class="section section--tint reveal" aria-labelledby="dest-alimentos">
+      <div class="container">
+        <div class="section__head">
+          <h2 id="dest-alimentos" class="section__title">Alimentos destacados</h2>
+          <a class="link-more" href="pages/alimentos.html">Ver todos →</a>
+        </div>
+        <div id="featured-foods" class="grid grid--4" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section reveal" aria-labelledby="dest-recetas">
+      <div class="container">
+        <div class="section__head">
+          <h2 id="dest-recetas" class="section__title">Recetas destacadas</h2>
+          <a class="link-more" href="pages/recetas.html">Ver todas →</a>
+        </div>
+        <div id="featured-recipes" class="grid grid--3" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- IA -->
+    <section class="section reveal" aria-labelledby="ai-title">
+      <div class="container">
+        <div class="ai-promo ai-promo--photo">
+          <div>
+            <p class="eyebrow eyebrow--light">NutriGuide AI</p>
+            <h2 id="ai-title">Un asistente que muestra de dónde sale cada respuesta</h2>
+            <p>Usa recuperación de información (RAG) sobre los documentos de la plataforma, por lo que puedes revisar los fragmentos en que se basó.</p>
+            <a class="btn btn--light btn--lg" href="pages/asistente.html">Probar el asistente</a>
+          </div>
+          <ul class="ai-promo__examples" aria-label="Ejemplos de preguntas">
+            <li><a href="pages/asistente.html?q=%C2%BFQu%C3%A9%20nutrientes%20contiene%20la%20avena%3F">¿Qué nutrientes contiene la avena?</a></li>
+            <li><a href="pages/asistente.html?q=%C2%BFQu%C3%A9%20alimentos%20contienen%20vitamina%20C%3F">¿Qué alimentos contienen vitamina C?</a></li>
+            <li><a href="pages/asistente.html?q=%C2%BFQu%C3%A9%20puedo%20preparar%20con%20arroz%20y%20verduras%3F">¿Qué puedo preparar con arroz y verduras?</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/mock-data.js"></script>
+  <script type="module" src="js/alimentos.js"></script>
+  <script type="module" src="js/recetas.js"></script>
+  <script type="module" src="js/home.js"></script>
+</body>
+</html>
