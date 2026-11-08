@@ -1,10 +1,12 @@
 package com.nutriguide.modules.documento;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 /**
- * Entidad JPA que representa un documento educativo de nutrición dentro de la biblioteca RAG.
+ * Documento educativo de la biblioteca del RAG. Sus fragmentos y embeddings se guardan en la
+ * tabla fragmentos_documentos (pgvector), relacionada por documento_id.
  */
 @Entity
 @Table(name = "documentos")
@@ -33,7 +35,7 @@ public class Documento {
     private String hashSha256;
 
     @Column(name = "fuente_origen", nullable = false, length = 255)
-    private String fuenteOrigen = "Fuente educativa institucional";
+    private String fuenteOrigen;
 
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
@@ -45,19 +47,27 @@ public class Documento {
     @Column(name = "mensaje_error", columnDefinition = "TEXT")
     private String mensajeError;
 
-    public Documento() {
-    }
+    /** Texto limpio extraído del archivo: se muestra en la biblioteca y permite reindexar. */
+    @Column(name = "contenido_texto", columnDefinition = "TEXT")
+    private String contenidoTexto;
+
+    /** Modelo de embeddings con el que se indexó (para reindexar si cambia). */
+    @Column(name = "modelo_embedding", length = 100)
+    private String modeloEmbedding;
+
+    @Column(name = "fecha_procesamiento")
+    private LocalDateTime fechaProcesamiento;
 
     @PrePersist
     public void prePersist() {
-        if (this.fechaCreacion == null) {
-            this.fechaCreacion = LocalDateTime.now();
+        if (fechaCreacion == null) {
+            fechaCreacion = LocalDateTime.now();
         }
-        if (this.estadoProcesamiento == null) {
-            this.estadoProcesamiento = EstadoProcesamiento.PENDIENTE;
+        if (estadoProcesamiento == null) {
+            estadoProcesamiento = EstadoProcesamiento.PENDIENTE;
         }
-        if (this.fuenteOrigen == null || this.fuenteOrigen.isBlank()) {
-            this.fuenteOrigen = "Fuente educativa institucional";
+        if (fuenteOrigen == null || fuenteOrigen.isBlank()) {
+            fuenteOrigen = "Fuente educativa institucional";
         }
     }
 
@@ -148,5 +158,28 @@ public class Documento {
     public void setMensajeError(String mensajeError) {
         this.mensajeError = mensajeError;
     }
-}
 
+    public String getContenidoTexto() {
+        return contenidoTexto;
+    }
+
+    public void setContenidoTexto(String contenidoTexto) {
+        this.contenidoTexto = contenidoTexto;
+    }
+
+    public String getModeloEmbedding() {
+        return modeloEmbedding;
+    }
+
+    public void setModeloEmbedding(String modeloEmbedding) {
+        this.modeloEmbedding = modeloEmbedding;
+    }
+
+    public LocalDateTime getFechaProcesamiento() {
+        return fechaProcesamiento;
+    }
+
+    public void setFechaProcesamiento(LocalDateTime fechaProcesamiento) {
+        this.fechaProcesamiento = fechaProcesamiento;
+    }
+}
