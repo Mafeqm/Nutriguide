@@ -126,10 +126,6 @@ function renderLayout() {
         el('p', { class: 'muted' }, 'La información es de carácter educativo y no reemplaza la consulta con un profesional de la salud.'))),
       el('p', { class: 'container footer-copy' }, `© ${new Date().getFullYear()} NutriGuide · Proyecto académico`));
   }
-  if (window.NUTRIGUIDE_CONFIG.USE_MOCK_DATA) {
-    document.body.prepend(el('div', { class: 'mock-banner', role: 'status' },
-      'Modo de prueba: alimentos, recetas y documentos son datos de ejemplo, no provienen del backend.'));
-  }
   // Región viva para toasts
   document.body.append(el('div', { id: 'toasts', class: 'toasts', role: 'status', 'aria-live': 'polite' }));
 }
