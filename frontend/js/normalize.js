@@ -45,6 +45,12 @@ export const normAlimento = (a) => ({
   ...normNutricion(a),
 });
 
+/** El backend envía el tiempo de preparación en minutos (número); se muestra como "N min". */
+export function formatTiempo(v) {
+  const t = str(v).trim();
+  return /^\d+$/.test(t) ? `${Number(t)} min` : t;
+}
+
 export function toSteps(v) {
   if (Array.isArray(v)) return v.map((p) => str(typeof p === 'object' && p ? p.descripcion ?? p.texto : p)).filter(Boolean);
   return str(v).split(/\r?\n/).map((s) => s.replace(/^\s*\d+[.)-]\s*/, '').trim()).filter(Boolean);
@@ -68,7 +74,7 @@ export const normReceta = (r) => ({
   categoria: nameOf(r.categoria),
   descripcion: str(r.descripcion),
   imagen: str(r.imagenUrl ?? r.imagen ?? r.urlImagen),
-  tiempo: str(r.tiempoPreparacion ?? r.tiempo),
+  tiempo: formatTiempo(r.tiempoPreparacion ?? r.tiempo),
   ingredientes: toIngredients(r.ingredientes),
   pasos: toSteps(r.preparacion ?? r.pasos ?? r.instrucciones),
   ...normNutricion(r),
