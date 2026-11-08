@@ -18,7 +18,7 @@ public class ChatController {
     }
 
     /**
-     * Endpoint principal del asistente educativo nutricional basado en RAG + pgvector.
+     * Endpoint principal del asistente educativo nutricional basado en RAG (flujo n8n con Qdrant y Gemini).
      */
     @PostMapping("/preguntar")
     public ResponseEntity<ChatResponse> preguntar(@Valid @RequestBody ChatRequest request) {
