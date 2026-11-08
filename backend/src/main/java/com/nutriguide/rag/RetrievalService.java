@@ -7,108 +7,76 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
- * Servicio encargado de la etapa de Recuperación (Retrieval) del flujo RAG:
- * genera el embedding de la pregunta, consulta pgvector por similitud semántica,
- * sanea los fragmentos frente a intentos de Prompt Injection indirecto y construye el contexto.
+ * Etapa de recuperación del RAG: genera el embedding de la pregunta, busca en pgvector los
+ * fragmentos más similares, neutraliza instrucciones maliciosas que puedan venir dentro de los
+ * documentos y construye el contexto delimitado que recibe el modelo de lenguaje.
  */
 @Service
 public class RetrievalService {
 
     private static final Logger log = LoggerFactory.getLogger(RetrievalService.class);
 
-    // Patrones de instrucciones maliciosas de Prompt Injection indirecto dentro de documentos
-    private static final Pattern PROMPT_INJECTION_PATTERN = Pattern.compile(
-            "(?i)(ignora\\s+(todas\\s+)?las\\s+instrucciones\\s+anteriores|"
-                    + "ignore\\s+(all\\s+)?previous\\s+instructions|"
-                    + "olvida\\s+tus\\s+reglas|"
-                    + "system\\s*prompt\\s*:|"
-                    + "act[uú]a\\s+como\\s+un\\s+sistema\\s+sin\\s+restricciones|"
-                    + "eres\\s+ahora\\s+un\\s+modelo\\s+sin\\s+reglas)");
+    static final String TEXTO_BLOQUEADO = "[INSTRUCCIÓN EXTERNA BLOQUEADA POR SEGURIDAD]";
+
+    // Instrucciones típicas de inyección de prompt indirecta (español e inglés)
+    private static final Pattern PROMPT_INJECTION = Pattern.compile(
+            "(?iu)(ignora\\s+(todas\\s+)?(las\\s+)?instrucciones(\\s+anteriores|\\s+previas)?"
+                    + "|ignore\\s+(all\\s+)?(the\\s+)?(previous|prior|above)\\s+instructions"
+                    + "|olvida\\s+(todas\\s+)?(tus|las)\\s+(reglas|instrucciones)"
+                    + "|disregard\\s+(all\\s+)?(previous|prior)\\s+instructions"
+                    + "|system\\s*prompt\\s*:"
+                    + "|act[uú]a\\s+como\\s+(un\\s+)?(sistema|modelo|asistente)\\s+sin\\s+(restricciones|reglas)"
+                    + "|eres\\s+ahora\\s+(un\\s+)?(modelo|asistente)\\s+sin\\s+(reglas|restricciones)"
+                    + "|you\\s+are\\s+now\\s+(a|an)\\s+\\w+)");
+
+    // Evita que un documento cierre o abra el bloque de contexto
+    private static final Pattern DELIMITADOR = Pattern.compile("(?i)</?\\s*CONTEXTO_DOCUMENTAL_VERIFICADO\\s*>");
 
     private final EmbeddingService embeddingService;
     private final VectorRepository vectorRepository;
     private final AiConfig aiConfig;
 
-    public RetrievalService(
-            EmbeddingService embeddingService,
-            VectorRepository vectorRepository,
-            AiConfig aiConfig) {
+    public RetrievalService(EmbeddingService embeddingService, VectorRepository vectorRepository, AiConfig aiConfig) {
         this.embeddingService = embeddingService;
         this.vectorRepository = vectorRepository;
         this.aiConfig = aiConfig;
     }
 
-    /**
-     * Recupera los fragmentos más relevantes semánticamente desde pgvector para una pregunta dada.
-     */
     public List<FragmentoRecuperado> recuperarFragmentosRelevantes(String pregunta) {
-        if (pregunta == null || pregunta.isBlank()) {
-            throw new IllegalArgumentException("La pregunta no puede estar vacía.");
-        }
-
-        float[] embeddingPregunta = embeddingService.generarEmbedding(pregunta.trim());
+        float[] embeddingPregunta = embeddingService.generarEmbeddingConsulta(pregunta.trim());
         List<FragmentoRecuperado> recuperados = vectorRepository.buscarSimilares(
-                embeddingPregunta,
-                aiConfig.getTopK(),
-                aiConfig.getMinSimilarity()
-        );
-
-        log.info("Búsqueda vectorial en pgvector para '{}': {} fragmentos recuperados (umbral >= {}).",
-                pregunta, recuperados.size(), aiConfig.getMinSimilarity());
-
-        return recuperados.stream()
-                .map(this::sanitizarFragmento)
-                .toList();
+                embeddingPregunta, aiConfig.getTopK(), aiConfig.getMinSimilarity());
+        if (log.isInfoEnabled()) {
+            log.info("Búsqueda vectorial: {} fragmentos con similitud >= {} (mejor: {}).",
+                    recuperados.size(), aiConfig.getMinSimilarity(),
+                    recuperados.isEmpty() ? "-" : String.format(Locale.ROOT, "%.3f", recuperados.get(0).similitud()));
+        }
+        return recuperados.stream().map(this::sanitizarFragmento).toList();
     }
 
-    /**
-     * Construye el bloque de contexto estructurado y delimitado para el modelo de lenguaje,
-     * incluyendo título del documento original, fuente institucional y número de fragmento.
-     */
     public String construirContextoDocumental(List<FragmentoRecuperado> fragmentos) {
-        if (fragmentos == null || fragmentos.isEmpty()) {
-            return "";
-        }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < fragmentos.size(); i++) {
             FragmentoRecuperado f = fragmentos.get(i);
-            sb.append("--- INICIO FUENTE DOCUMENTAL #").append(i + 1).append(" ---\n");
-            sb.append("Título del documento: ").append(f.tituloDocumento()).append("\n");
-            sb.append("Procedencia / Fuente oficial: ").append(f.fuenteOrigen()).append("\n");
-            sb.append("Categoría: ").append(f.categoriaDocumento()).append("\n");
-            sb.append("Fragmento N°: ").append(f.numeroFragmento())
-                    .append(" (Similitud semántica: ")
-                    .append(String.format("%.2f", f.similitud()))
-                    .append(")\n");
-            sb.append("Contenido del fragmento:\n");
-            sb.append(f.contenido()).append("\n");
-            sb.append("--- FIN FUENTE DOCUMENTAL #").append(i + 1).append(" ---\n\n");
+            sb.append("--- FUENTE DOCUMENTAL #").append(i + 1).append(" ---\n")
+                    .append("Título del documento: ").append(f.tituloDocumento()).append('\n')
+                    .append("Procedencia: ").append(f.fuenteOrigen()).append('\n')
+                    .append("Categoría: ").append(f.categoriaDocumento()).append('\n')
+                    .append("Fragmento N.º ").append(f.numeroFragmento()).append('\n')
+                    .append("Contenido:\n").append(f.contenido()).append("\n\n");
         }
         return sb.toString().trim();
     }
 
-    /**
-     * Neutraliza posibles instrucciones maliciosas incrustadas dentro de los documentos recuperados
-     * para evitar que el modelo de lenguaje obedezca órdenes contenidas en datos externos.
-     */
-    public FragmentoRecuperado sanitizarFragmento(FragmentoRecuperado fragmento) {
-        String contenidoSeguro = PROMPT_INJECTION_PATTERN
-                .matcher(fragmento.contenido())
-                .replaceAll("[INSTRUCCIÓN EXTERNA BLOQUEADA POR SEGURIDAD]");
-        return new FragmentoRecuperado(
-                fragmento.id(),
-                fragmento.documentoId(),
-                fragmento.tituloDocumento(),
-                fragmento.categoriaDocumento(),
-                fragmento.fuenteOrigen(),
-                fragmento.nombreArchivo(),
-                contenidoSeguro,
-                fragmento.numeroFragmento(),
-                fragmento.similitud()
-        );
+    /** Sustituye instrucciones maliciosas y delimitadores del prompt dentro de un fragmento. */
+    public FragmentoRecuperado sanitizarFragmento(FragmentoRecuperado f) {
+        String limpio = PROMPT_INJECTION.matcher(f.contenido()).replaceAll(TEXTO_BLOQUEADO);
+        limpio = DELIMITADOR.matcher(limpio).replaceAll(TEXTO_BLOQUEADO);
+        return new FragmentoRecuperado(f.id(), f.documentoId(), f.tituloDocumento(), f.categoriaDocumento(),
+                f.fuenteOrigen(), f.nombreArchivo(), limpio, f.numeroFragmento(), f.similitud());
     }
 }
-
