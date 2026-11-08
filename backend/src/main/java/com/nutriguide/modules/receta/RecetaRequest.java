@@ -3,6 +3,8 @@ package com.nutriguide.modules.receta;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
+
 /**
  * DTO de entrada con validaciones para crear o actualizar una receta educativa.
  */
@@ -37,6 +39,27 @@ public class RecetaRequest {
     @NotBlank(message = "La categoría de la receta es obligatoria")
     @Size(max = 100, message = "La categoría no puede superar los 100 caracteres")
     private String categoria;
+
+    // Valores nutricionales opcionales por porción servida
+
+    @DecimalMin(value = "0.0", message = "El valor de calorias no puede ser negativo")
+    private BigDecimal calorias;
+
+    @DecimalMin(value = "0.0", message = "El valor de proteinas no puede ser negativo")
+    private BigDecimal proteinas;
+
+    @DecimalMin(value = "0.0", message = "El valor de carbohidratos no puede ser negativo")
+    private BigDecimal carbohidratos;
+
+    @DecimalMin(value = "0.0", message = "El valor de grasas no puede ser negativo")
+    private BigDecimal grasas;
+
+    @DecimalMin(value = "0.0", message = "El valor de fibra no puede ser negativo")
+    private BigDecimal fibra;
+
+    @JsonAlias({"porcion_gramos"})
+    @DecimalMin(value = "0.01", message = "La porción en gramos debe ser mayor que 0")
+    private BigDecimal porcionGramos;
 
     public RecetaRequest() {
     }
@@ -104,5 +127,52 @@ public class RecetaRequest {
     public void setCategoria(String categoria) {
         this.categoria = categoria;
     }
-}
 
+    public BigDecimal getCalorias() {
+        return calorias;
+    }
+
+    public void setCalorias(BigDecimal calorias) {
+        this.calorias = calorias;
+    }
+
+    public BigDecimal getProteinas() {
+        return proteinas;
+    }
+
+    public void setProteinas(BigDecimal proteinas) {
+        this.proteinas = proteinas;
+    }
+
+    public BigDecimal getCarbohidratos() {
+        return carbohidratos;
+    }
+
+    public void setCarbohidratos(BigDecimal carbohidratos) {
+        this.carbohidratos = carbohidratos;
+    }
+
+    public BigDecimal getGrasas() {
+        return grasas;
+    }
+
+    public void setGrasas(BigDecimal grasas) {
+        this.grasas = grasas;
+    }
+
+    public BigDecimal getFibra() {
+        return fibra;
+    }
+
+    public void setFibra(BigDecimal fibra) {
+        this.fibra = fibra;
+    }
+
+    public BigDecimal getPorcionGramos() {
+        return porcionGramos;
+    }
+
+    public void setPorcionGramos(BigDecimal porcionGramos) {
+        this.porcionGramos = porcionGramos;
+    }
+}
