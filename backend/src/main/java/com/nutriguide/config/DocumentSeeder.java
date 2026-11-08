@@ -5,6 +5,7 @@ import com.nutriguide.modules.documento.DocumentoResponse;
 import com.nutriguide.modules.documento.DocumentoService;
 import com.nutriguide.modules.documento.DocumentoTextoRequest;
 import com.nutriguide.modules.documento.EstadoProcesamiento;
+import com.nutriguide.ia.N8nClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,8 +23,7 @@ import java.util.List;
  * Al arrancar:
  * <ol>
  *   <li>Registra los documentos educativos de src/main/resources/initial-docs que aún no existan.</li>
- *   <li>Si GEMINI_API_KEY está configurada, indexa en pgvector los documentos pendientes, con error o
- *       indexados con otro modelo de embeddings.</li>
+ *   <li>Si el servicio de IA (n8n) está configurado, indexa en Qdrant los documentos pendientes o con error.</li>
  * </ol>
  * Los alimentos y las recetas iniciales se cargan con SQL (db/data.sql), no aquí.
  */
@@ -71,7 +71,7 @@ public class DocumentSeeder {
     @Order(2)
     public ApplicationRunner indexarDocumentosIniciales(DocumentoRepository documentoRepository,
                                                         DocumentoService documentoService,
-                                                        AiConfig aiConfig) {
+                                                        N8nClient n8nClient) {
         return args -> {
             if (seedEnabled) {
                 for (Semilla semilla : SEMILLAS) {
@@ -93,7 +93,7 @@ public class DocumentSeeder {
                 }
             }
 
-            if (aiConfig.hasValidApiKey()) {
+            if (n8nClient.estaConfigurado()) {
                 List<DocumentoResponse> procesados = documentoService.reprocesarPendientes();
                 long correctos = procesados.stream()
                         .filter(d -> d.estadoProcesamiento() == EstadoProcesamiento.PROCESADO).count();
