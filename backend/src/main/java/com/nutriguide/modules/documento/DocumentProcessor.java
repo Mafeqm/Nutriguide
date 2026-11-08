@@ -1,4 +1,4 @@
-package com.nutriguide.rag;
+package com.nutriguide.modules.documento;
 
 import com.nutriguide.common.DocumentProcessingException;
 import org.apache.pdfbox.Loader;
