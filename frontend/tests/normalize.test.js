@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { toList, normAlimento, normReceta, normDocumento, normChat, toSteps, toIngredients } from '../js/normalize.js';
+import { toList, normAlimento, normReceta, normDocumento, normChat, toSteps, toIngredients, formatTiempo } from '../js/normalize.js';
 
 test('toList acepta arreglo o respuesta paginada', () => {
   assert.deepEqual(toList([1, 2]), [1, 2]);
@@ -47,4 +47,25 @@ test('normChat exige respuesta y normaliza fuentes', () => {
   assert.equal(c.fuentes[0].titulo, 'T');
   assert.equal(c.fuentes[1].titulo, 'Fuente sin título');
   assert.deepEqual(normChat({ respuesta: 'ok' }).fuentes, []);
+});
+
+test('el tiempo en minutos del backend se muestra con unidad', () => {
+  assert.equal(formatTiempo(12), '12 min');
+  assert.equal(formatTiempo('25'), '25 min');
+  assert.equal(formatTiempo('10 min'), '10 min');
+  assert.equal(formatTiempo(null), '');
+});
+
+test('normReceta acepta el formato del backend (listas y nutrición por porción)', () => {
+  const r = normReceta({
+    id: 2, nombre: 'Bowl', categoria: 'Almuerzos', tiempoPreparacion: 25,
+    ingredientes: ['60 g de quinua', '80 g de garbanzos'], pasos: ['Lavar.', 'Cocinar.'],
+    informacionNutricional: { calorias: 510, proteinas: 18.7, carbohidratos: null, tamanoPorcion: 435, unidadPorcion: 'g (1 porción servida)', fuente: 'Estimación USDA' },
+  });
+  assert.equal(r.tiempo, '25 min');
+  assert.deepEqual(r.pasos, ['Lavar.', 'Cocinar.']);
+  assert.equal(r.calorias, 510);
+  assert.equal(r.carbohidratos, null);
+  assert.equal(r.porcion, 435);
+  assert.equal(r.fuente, 'Estimación USDA');
 });
