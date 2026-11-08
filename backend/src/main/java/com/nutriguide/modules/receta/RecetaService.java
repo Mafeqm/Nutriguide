@@ -1,5 +1,6 @@
 package com.nutriguide.modules.receta;
 
+import com.nutriguide.common.BusquedaTexto;
 import com.nutriguide.common.DuplicateDocumentException;
 import com.nutriguide.common.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class RecetaService {
     public List<RecetaResponse> listarTodas(String categoria, String nombre) {
         List<Receta> recetas;
         if (nombre != null && !nombre.isBlank()) {
-            recetas = recetaRepository.findByNombreContainingIgnoreCaseOrderByNombreAsc(nombre.trim());
+            recetas = recetaRepository.buscarPorNombre(BusquedaTexto.patronLike(nombre));
         } else if (categoria != null && !categoria.isBlank()) {
             recetas = recetaRepository.findByCategoriaIgnoreCaseOrderByNombreAsc(categoria.trim());
         } else {
@@ -89,6 +90,12 @@ public class RecetaService {
         receta.setTiempoPreparacion(request.getTiempoPreparacion());
         receta.setInformacionNutricional(request.getInformacionNutricional().trim());
         receta.setCategoria(request.getCategoria().trim());
+        receta.setCalorias(request.getCalorias());
+        receta.setProteinas(request.getProteinas());
+        receta.setCarbohidratos(request.getCarbohidratos());
+        receta.setGrasas(request.getGrasas());
+        receta.setFibra(request.getFibra());
+        receta.setPorcionGramos(request.getPorcionGramos());
     }
 }
 
