@@ -4,17 +4,12 @@ HTML5 + CSS3 + JavaScript puro (sin frameworks). Consume el backend Spring Boot 
 
 ## Ejecutar
 
-El frontend es estático; sírvelo con cualquier servidor HTTP desde esta carpeta:
+**Lo normal:** no hace falta servirlo aparte. Al ejecutar el backend (`NutriGuideApplication` en IntelliJ o `./mvnw spring-boot:run`), Spring Boot sirve esta carpeta y la aplicación queda en **http://localhost:8080**.
 
-```bash
-cd frontend
-python -m http.server 5500      # o: npx serve -l 5500
-```
+También puedes servirlo con cualquier servidor estático mientras desarrollas el frontend (Live Server, `python -m http.server 5500`, el servidor integrado de IntelliJ…). El backend acepta por CORS cualquier puerto de `localhost`.
 
-Abre http://localhost:5500
-
-1. Edita la URL del backend en [js/config.js](js/config.js) (`API_BASE_URL`, por defecto `http://localhost:8080`). Es el único lugar donde aparece.
-2. El backend debe habilitar **CORS** para el origen del frontend (p. ej. `http://localhost:5500`) con métodos GET y POST y cabecera `Content-Type`.
+1. La URL del backend está en [js/config.js](js/config.js) (`API_BASE_URL`, por defecto `http://localhost:8080`). Es el único lugar donde aparece.
+2. Si el frontend se publica en otro dominio, añádelo a `CORS_ALLOWED_ORIGINS` del backend.
 3. Si el backend aún no está listo, pon `USE_MOCK_DATA: true` en `config.js`: alimentos, recetas y documentos usarán `js/mock-data.js` (datos de prueba, con un aviso visible). **El chat nunca se simula**; siempre llama a `POST /api/chat/preguntar`.
 
 ## Estructura
