@@ -2,7 +2,6 @@ package com.nutriguide.modules.documento;
 
 import com.nutriguide.common.ApiResponse;
 import com.nutriguide.modules.documento.DocumentoService.ArchivoDocumento;
-import com.nutriguide.rag.VectorRepository.FragmentoAlmacenado;
 import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -17,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
- * Biblioteca de documentos educativos e ingesta del RAG.
+ * Biblioteca de documentos educativos. La indexación en Qdrant la hace el flujo n8n de la carpeta IA.
  * Las consultas (GET) son públicas; la carga, el reprocesamiento y el borrado requieren
  * la cabecera X-Admin-Token (ver AdminTokenInterceptor).
  */
@@ -40,12 +39,6 @@ public class DocumentoController {
     @GetMapping("/{id}")
     public DocumentoResponse obtener(@PathVariable Long id) {
         return documentoService.obtener(id);
-    }
-
-    /** Fragmentos almacenados en pgvector (contenido y dimensión del vector), para verificación. */
-    @GetMapping("/{id}/fragmentos")
-    public List<FragmentoAlmacenado> fragmentos(@PathVariable Long id) {
-        return documentoService.listarFragmentos(id);
     }
 
     /** Archivo original (.pdf o .txt). */
