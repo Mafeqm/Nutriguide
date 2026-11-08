@@ -2,19 +2,19 @@ package com.nutriguide.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
+import java.util.List;
 
 /**
- * Configuración de la base de datos relacional y vectorial (PostgreSQL + pgvector).
- * Verifica la disponibilidad de la extensión pgvector y garantiza la estructura vectorial.
+ * Verificación de la base vectorial al arrancar.
+ * El esquema lo crea db/schema.sql; aquí se comprueba que pgvector esté instalado y que la
+ * dimensión de la columna embedding coincida con ai.embedding.dimension. Si no coincide, la
+ * aplicación no arranca: guardar vectores de otra dimensión fallaría en cada documento.
  */
 @Configuration
 public class DatabaseConfig {
@@ -23,46 +23,33 @@ public class DatabaseConfig {
 
     @Bean
     @Order(1)
-    public CommandLineRunner initializePgVectorExtension(
-            DataSource dataSource,
-            JdbcTemplate jdbcTemplate,
-            AiConfig aiConfig) {
+    public ApplicationRunner verificarPgVector(JdbcTemplate jdbcTemplate, AiConfig aiConfig) {
         return args -> {
-            try (Connection connection = dataSource.getConnection()) {
-                DatabaseMetaData metaData = connection.getMetaData();
-                String dbProductName = metaData.getDatabaseProductName();
-                log.info("Conectado a base de datos: {} ({})", dbProductName, metaData.getDatabaseProductVersion());
+            List<String> version = jdbcTemplate.queryForList(
+                    "SELECT extversion FROM pg_extension WHERE extname = 'vector'", String.class);
+            if (version.isEmpty()) {
+                throw new IllegalStateException(
+                        "La extensión pgvector no está instalada en PostgreSQL. Use la imagen pgvector/pgvector:pg16 "
+                                + "(docker-compose) o instale la extensión 'vector'.");
+            }
 
-                if (dbProductName != null && dbProductName.toLowerCase().contains("postgresql")) {
-                    jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS vector");
-                    int dimension = aiConfig.getEmbeddingDimension();
-                    jdbcTemplate.execute("""
-                            CREATE TABLE IF NOT EXISTS fragmentos_documentos (
-                                id BIGSERIAL PRIMARY KEY,
-                                documento_id BIGINT NOT NULL REFERENCES documentos(id) ON DELETE CASCADE,
-                                contenido TEXT NOT NULL,
-                                numero_fragmento INTEGER NOT NULL CHECK (numero_fragmento >= 1),
-                                embedding vector(%d) NOT NULL,
-                                CONSTRAINT uk_documento_numero_fragmento UNIQUE (documento_id, numero_fragmento)
-                            )
-                            """.formatted(dimension));
-                    jdbcTemplate.execute(
-                            "CREATE INDEX IF NOT EXISTS idx_fragmentos_documento_id ON fragmentos_documentos (documento_id)");
-                    jdbcTemplate.execute("""
-                            CREATE INDEX IF NOT EXISTS idx_fragmentos_embedding_hnsw
-                            ON fragmentos_documentos USING hnsw (embedding vector_cosine_ops)
-                            """);
-                    log.info("Extensión pgvector verificada y tabla vectorial 'fragmentos_documentos' (dimensión {}) lista.",
-                            dimension);
-                } else {
-                    log.info("Ejecutando en motor '{}' (modo de pruebas sin extensión nativa pgvector).", dbProductName);
-                }
-            } catch (Exception ex) {
-                log.error("Error al inicializar la extensión pgvector en PostgreSQL. " +
-                        "Verifique que la imagen o instancia PostgreSQL tenga instalada la extensión 'vector': {}",
-                        ex.getMessage());
+            Integer dimension = jdbcTemplate.queryForObject("""
+                    SELECT a.atttypmod
+                    FROM pg_attribute a
+                    WHERE a.attrelid = 'fragmentos_documentos'::regclass
+                      AND a.attname = 'embedding'
+                    """, Integer.class);
+            if (dimension == null || dimension != aiConfig.getEmbeddingDimension()) {
+                throw new IllegalStateException("La columna fragmentos_documentos.embedding tiene dimensión "
+                        + dimension + " pero ai.embedding.dimension=" + aiConfig.getEmbeddingDimension()
+                        + ". Ajuste ambos valores para que coincidan.");
+            }
+            log.info("pgvector {} activo. Columna embedding: vector({}).", version.get(0), dimension);
+
+            if (!aiConfig.hasValidApiKey()) {
+                log.warn("GEMINI_API_KEY no está configurada: el chat responderá 503 y los documentos "
+                        + "quedarán PENDIENTES de indexar hasta que se configure la clave.");
             }
         };
     }
 }
-
