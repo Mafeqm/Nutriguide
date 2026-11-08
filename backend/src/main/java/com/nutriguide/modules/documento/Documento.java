@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * Documento educativo de la biblioteca del RAG. Sus fragmentos y embeddings se guardan en la
- * tabla fragmentos_documentos (pgvector), relacionada por documento_id.
+ * Documento educativo de la biblioteca del RAG. El texto y los metadatos se guardan en PostgreSQL;
+ * sus fragmentos y embeddings los guarda el flujo n8n en Qdrant (payload metadata.documentoId).
  */
 @Entity
 @Table(name = "documentos")
@@ -51,9 +51,9 @@ public class Documento {
     @Column(name = "contenido_texto", columnDefinition = "TEXT")
     private String contenidoTexto;
 
-    /** Modelo de embeddings con el que se indexó (para reindexar si cambia). */
-    @Column(name = "modelo_embedding", length = 100)
-    private String modeloEmbedding;
+    /** Número de fragmentos indexados en Qdrant (lo informa el flujo n8n). */
+    @Column(name = "total_fragmentos", nullable = false)
+    private int totalFragmentos;
 
     @Column(name = "fecha_procesamiento")
     private LocalDateTime fechaProcesamiento;
@@ -167,12 +167,12 @@ public class Documento {
         this.contenidoTexto = contenidoTexto;
     }
 
-    public String getModeloEmbedding() {
-        return modeloEmbedding;
+    public int getTotalFragmentos() {
+        return totalFragmentos;
     }
 
-    public void setModeloEmbedding(String modeloEmbedding) {
-        this.modeloEmbedding = modeloEmbedding;
+    public void setTotalFragmentos(int totalFragmentos) {
+        this.totalFragmentos = totalFragmentos;
     }
 
     public LocalDateTime getFechaProcesamiento() {
