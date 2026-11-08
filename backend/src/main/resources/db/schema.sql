@@ -1,18 +1,17 @@
 -- =============================================================================
--- NUTRIGUIDE - ESQUEMA DE BASE DE DATOS (PostgreSQL 16 + pgvector)
+-- NUTRIGUIDE - ESQUEMA DE BASE DE DATOS RELACIONAL (PostgreSQL 16)
 -- Única fuente de verdad del esquema. Spring Boot lo ejecuta al arrancar
 -- (spring.sql.init) y Hibernate solo VALIDA que las entidades coincidan.
 -- Es idempotente: se puede ejecutar varias veces sin perder datos.
 --
--- Dimensión de los embeddings: 768.
--- Debe coincidir con ai.embedding.dimension (application.properties). El modelo
--- gemini-embedding-001 genera 3072 dimensiones por defecto y se le solicita 768
--- mediante el parámetro outputDimensionality. Para cambiarla hay que modificar
--- vector(768) aquí, la propiedad y volver a indexar los documentos.
+-- La base de datos VECTORIAL ya no está aquí: los fragmentos de los documentos y
+-- sus embeddings los guarda el flujo n8n en Qdrant (carpeta IA del repositorio).
 -- =============================================================================
 
--- 1. Extensión vectorial pgvector
-CREATE EXTENSION IF NOT EXISTS vector;
+-- 1. Limpieza de la versión anterior, que guardaba los vectores en PostgreSQL con pgvector.
+--    Los fragmentos se regeneran en Qdrant al reindexar, así que no se pierde información original.
+DROP TABLE IF EXISTS fragmentos_documentos;
+DROP EXTENSION IF EXISTS vector;
 
 -- 2. Alimentos. Todos los valores nutricionales están expresados por
 --    porcion_referencia + unidad (en los datos iniciales: por 100 g).
@@ -76,28 +75,13 @@ CREATE TABLE IF NOT EXISTS documentos (
     mensaje_error        TEXT
 );
 
--- Texto limpio extraído (para mostrarlo en la biblioteca y poder reindexar) y
--- modelo de embeddings con el que se indexó (para detectar cambios de modelo)
+-- Texto limpio extraído (se muestra en la biblioteca y es lo que se envía a n8n para indexar)
+-- y número de fragmentos guardados en Qdrant
 ALTER TABLE documentos ADD COLUMN IF NOT EXISTS contenido_texto     TEXT;
-ALTER TABLE documentos ADD COLUMN IF NOT EXISTS modelo_embedding    VARCHAR(100);
 ALTER TABLE documentos ADD COLUMN IF NOT EXISTS fecha_procesamiento TIMESTAMP;
+ALTER TABLE documentos ADD COLUMN IF NOT EXISTS total_fragmentos    INTEGER NOT NULL DEFAULT 0 CHECK (total_fragmentos >= 0);
+ALTER TABLE documentos DROP COLUMN IF EXISTS modelo_embedding;
 
 CREATE INDEX IF NOT EXISTS idx_documentos_estado    ON documentos (estado_procesamiento);
 CREATE INDEX IF NOT EXISTS idx_documentos_categoria ON documentos (LOWER(categoria));
 CREATE UNIQUE INDEX IF NOT EXISTS uk_documentos_titulo ON documentos (LOWER(titulo));
-
--- 5. Fragmentos de documentos con su embedding (base de datos vectorial)
-CREATE TABLE IF NOT EXISTS fragmentos_documentos (
-    id               BIGSERIAL PRIMARY KEY,
-    documento_id     BIGINT  NOT NULL REFERENCES documentos (id) ON DELETE CASCADE,
-    contenido        TEXT    NOT NULL,
-    numero_fragmento INTEGER NOT NULL CHECK (numero_fragmento >= 1),
-    embedding        vector(768) NOT NULL,
-    CONSTRAINT uk_documento_numero_fragmento UNIQUE (documento_id, numero_fragmento)
-);
-
-CREATE INDEX IF NOT EXISTS idx_fragmentos_documento_id ON fragmentos_documentos (documento_id);
-
--- Índice HNSW con distancia coseno para la búsqueda semántica
-CREATE INDEX IF NOT EXISTS idx_fragmentos_embedding_hnsw
-    ON fragmentos_documentos USING hnsw (embedding vector_cosine_ops);
