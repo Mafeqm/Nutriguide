@@ -1,3 +1,7 @@
+# PostgreSQL 16 con la extensión pgvector para NutriGuide.
+# El esquema y los datos iniciales los crea el backend al arrancar (src/main/resources/db).
+name: nutriguide
+
 services:
   nutriguide-postgres:
     image: pgvector/pgvector:pg16
@@ -6,15 +10,13 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:-nutriguide_db}
       POSTGRES_USER: ${DB_USERNAME:-nutriguide}
+      # Contraseña solo para desarrollo local; cámbiala con la variable DB_PASSWORD
       POSTGRES_PASSWORD: ${DB_PASSWORD:-nutriguide_dev_pass}
     ports:
-      # Se expone en el puerto 5433 del host por defecto para no entrar en conflicto
-      # con instalaciones locales de PostgreSQL en Windows que usan el puerto 5432.
-      - "${DB_PORT:-5433}:5432"
+      # Puerto 5434 del host para no chocar con un PostgreSQL local en 5432
+      - "${DB_PORT:-5434}:5432"
     volumes:
       - nutriguide_pgdata:/var/lib/postgresql/data
-      - ./sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
-      - ./sql/02_seed_data.sql:/docker-entrypoint-initdb.d/02_seed_data.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-nutriguide} -d ${DB_NAME:-nutriguide_db}"]
       interval: 5s
@@ -23,4 +25,3 @@ services:
 
 volumes:
   nutriguide_pgdata:
-
