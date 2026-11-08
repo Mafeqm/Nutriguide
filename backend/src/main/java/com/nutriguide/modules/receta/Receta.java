@@ -2,6 +2,8 @@ package com.nutriguide.modules.receta;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 /**
  * Entidad JPA que representa una receta educativa con ingredientes, preparación
  * e información nutricional estandarizada por porción.
@@ -37,6 +39,26 @@ public class Receta {
 
     @Column(nullable = false, length = 100)
     private String categoria;
+
+    // Valores nutricionales por porción servida (opcionales; NULL si no se conocen)
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal calorias;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal proteinas;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal carbohidratos;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal grasas;
+
+    @Column(precision = 8, scale = 2)
+    private BigDecimal fibra;
+
+    @Column(name = "porcion_gramos", precision = 8, scale = 2)
+    private BigDecimal porcionGramos;
 
     public Receta() {
     }
@@ -131,5 +153,52 @@ public class Receta {
     public void setCategoria(String categoria) {
         this.categoria = categoria;
     }
-}
 
+    public BigDecimal getCalorias() {
+        return calorias;
+    }
+
+    public void setCalorias(BigDecimal calorias) {
+        this.calorias = calorias;
+    }
+
+    public BigDecimal getProteinas() {
+        return proteinas;
+    }
+
+    public void setProteinas(BigDecimal proteinas) {
+        this.proteinas = proteinas;
+    }
+
+    public BigDecimal getCarbohidratos() {
+        return carbohidratos;
+    }
+
+    public void setCarbohidratos(BigDecimal carbohidratos) {
+        this.carbohidratos = carbohidratos;
+    }
+
+    public BigDecimal getGrasas() {
+        return grasas;
+    }
+
+    public void setGrasas(BigDecimal grasas) {
+        this.grasas = grasas;
+    }
+
+    public BigDecimal getFibra() {
+        return fibra;
+    }
+
+    public void setFibra(BigDecimal fibra) {
+        this.fibra = fibra;
+    }
+
+    public BigDecimal getPorcionGramos() {
+        return porcionGramos;
+    }
+
+    public void setPorcionGramos(BigDecimal porcionGramos) {
+        this.porcionGramos = porcionGramos;
+    }
+}
