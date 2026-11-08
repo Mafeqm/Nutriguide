@@ -35,7 +35,7 @@ export const Art = (() => {
     [/manzana|pera\b|fruta|uva|fresa|mora/, 'apple'], [/naranja|mandarina|citric/, 'orange'], [/zanahoria/, 'carrot'],
     [/brocoli|coliflor|espinaca|verdura|lechuga|ensalada|hortaliza|vegetal/, 'broccoli'], [/aguacate|palta/, 'avocado'],
     [/tomate/, 'tomato'], [/huevo/, 'egg'], [/avena|arroz|trigo|cereal|pan\b|pasta|quinua|quinoa|maiz|grano/, 'wheat'],
-    [/agua|hidrat|jugo|bebida/, 'drop'], [/lenteja|frijol|garbanzo|legumbre|soya|haba|alubia/, 'bean'], [/limon/, 'lemon'],
+    [/agua|hidrat|jugo|bebida/, 'drop'], [/lenteja|frijol|garbanzo|legumbre|legumin|soya|haba|alubia/, 'bean'], [/limon/, 'lemon'],
     [/pescado|salmon|atun|trucha|mariscos?/, 'fish'], [/leche|yogur|queso|lacteo/, 'milk'], [/pollo|carne|res\b|cerdo|pavo|proteina/, 'drumstick'],
   ];
   const strip = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
