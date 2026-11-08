@@ -4,52 +4,72 @@ Plataforma web educativa para consultar alimentos y sus propiedades nutricionale
 
 > **Aviso:** NutriGuide es una herramienta educativa. No diagnostica enfermedades, no prescribe dietas y no reemplaza la orientación de un profesional de la salud.
 
+## Arquitectura
+
+```
+┌──────────────┐     ┌────────────────────────────┐     ┌───────────────────────────────┐
+│   Frontend   │────►│  Backend (Spring Boot)     │────►│  IA: n8n (flujo RAG)          │
+│ HTML/CSS/JS  │     │  /api/alimentos, /recetas, │     │   ├─ Qdrant (base vectorial)  │
+└──────────────┘     │  /documentos, /chat        │     │   └─ Google Gemini            │
+                     └─────────────┬──────────────┘     └───────────────────────────────┘
+                                   ▼
+                         PostgreSQL (datos relacionales)
+```
+
+- El **frontend** solo habla con el backend.
+- El **backend** guarda alimentos, recetas y documentos en PostgreSQL. Para la IA llama a los webhooks de n8n con un token compartido.
+- **n8n** ejecuta todo el asistente: fragmenta los documentos, genera embeddings, los guarda y busca en **Qdrant**, y redacta las respuestas con Gemini.
+
 ## Estado del proyecto
 
 | Área | Estado |
 |---|---|
-| Frontend (HTML5 + CSS3 + JavaScript puro) | **Implementado y probado contra el backend real** (catálogo, detalle, recetas, biblioteca y chat). 12 pruebas unitarias. |
-| Backend (Java 21 + Spring Boot 3.4) | **Implementado.** Compila y arranca contra PostgreSQL + pgvector. 29 pruebas (unitarias e integración). |
+| Frontend (HTML5 + CSS3 + JavaScript puro) | **Implementado y probado contra el backend real**, incluido el chat. 12 pruebas unitarias. |
+| Backend (Java 21 + Spring Boot 3.4) | **Implementado.** Compila y arranca. 22 pruebas (unitarias e integración con PostgreSQL real). |
 | Base de datos relacional (PostgreSQL 16) | **Implementada.** Esquema único con restricciones, índices y datos iniciales. |
-| Base de datos vectorial (pgvector) | **Implementada y probada** con PostgreSQL + pgvector real (vectores de 768 dimensiones, índice HNSW, búsqueda coseno). |
-| Sistema RAG (embeddings + modelo de lenguaje) | **Implementado.** El flujo completo está probado con un doble del proveedor de IA. **Pendiente: probarlo con una clave real de Google Gemini** y ajustar la similitud mínima. |
+| Asistente de IA (n8n + Qdrant) | **Implementado y probado con Google Gemini real**, n8n 2.46.6 y Qdrant 1.20.0: 5 documentos indexados (27 fragmentos), respuestas con fuentes, casos sin información y preguntas médicas remitidas a un profesional. |
 
 ## Tecnologías
 
 - **Frontend:** HTML5, CSS3 y JavaScript puro (Fetch API). Sin frameworks.
 - **Backend:** Java 21, Spring Boot (Web, Data JPA, Validation), Maven (wrapper incluido).
-- **Bases de datos:** PostgreSQL 16 con la extensión **pgvector**.
-- **Inteligencia artificial:** Google Gemini: `gemini-embedding-001` (embeddings) y `gemini-2.5-flash` (respuestas), integrados con el `HttpClient` de Java. El RAG está implementado en Java.
+- **Base de datos relacional:** PostgreSQL 16.
+- **Asistente de IA:** n8n (flujo RAG), Qdrant (base vectorial) y Google Gemini (`gemini-embedding-001` para embeddings y `gemini-3.5-flash-lite` para las respuestas, ambos configurables en `IA/.env`).
 
-## Puesta en marcha rápida
+## Cómo ejecutarlo (Windows, Ubuntu o macOS)
 
-**Windows, un solo comando** (con Docker Desktop abierto):
+**Requisitos:** JDK 21, Docker (Docker Desktop en Windows/macOS o Docker Engine con el plugin `compose` en Ubuntu) e IntelliJ IDEA. No hace falta instalar Maven ni ningún script: el proyecto trae el Maven Wrapper.
 
-```powershell
-# La primera vez: copia backend\.env.example a backend\.env y pon tu GEMINI_API_KEY
-powershell -ExecutionPolicy Bypass -File .\iniciar-nutriguide.ps1           # arrancar
-powershell -ExecutionPolicy Bypass -File .\iniciar-nutriguide.ps1 -Detener  # detener
-```
+1. **Clona el repositorio** y ábrelo en IntelliJ (*File → Open* → la carpeta del proyecto o `backend/pom.xml`). Si IntelliJ pregunta, carga el proyecto Maven.
+2. **Solo la primera vez, para el chat:** copia `IA/.env.example` como `IA/.env` y pon tu `GEMINI_API_KEY` (<https://aistudio.google.com/apikey>). Todo lo demás funciona sin configurar nada.
+3. **Con Docker encendido, ejecuta `NutriGuideApplication`** (botón ▶ junto a la clase `backend/src/main/java/com/nutriguide/NutriGuideApplication.java`).
+4. Abre **http://localhost:8080**.
 
-El script levanta la base de datos, compila y arranca el backend (registro en `backend\logs\`) y sirve el frontend en `http://localhost:5500`. Si ya usas Live Server de VS Code con la carpeta del proyecto abierta, el frontend está en `http://127.0.0.1:5500/frontend/index.html`. Tras cambiar código del backend, usa `-Compilar`.
+Al pulsar Run, Spring Boot:
 
-**Paso a paso (cualquier sistema):**
+- levanta con Docker Compose **PostgreSQL, n8n y Qdrant** y espera a que estén listos (la primera vez descarga las imágenes; tarda unos minutos);
+- n8n importa y publica solo el flujo `IA/nutriguide-ia.json`;
+- lee `backend/.env` e `IA/.env` si existen (no hay que exportar variables);
+- crea las tablas, carga los datos iniciales e indexa los documentos en Qdrant;
+- sirve el frontend en el mismo puerto 8080.
+
+Al detener la aplicación, los contenedores siguen encendidos para que el siguiente Run sea rápido. Para apagarlos: `docker compose stop` desde la carpeta `backend`.
+
+Desde una terminal, el equivalente es:
 
 ```bash
-# 1. Base de datos (PostgreSQL 16 + pgvector en el puerto 5434)
 cd backend
-docker compose up -d
-
-# 2. Backend en http://localhost:8080 (ver backend/README.md para las variables)
-#    PowerShell: $env:GEMINI_API_KEY="tu-clave"; $env:ADMIN_TOKEN="un-token-largo"
-./mvnw spring-boot:run
-
-# 3. Frontend en http://localhost:5500
-cd ../frontend
-python -m http.server 5500
+./mvnw spring-boot:run        # Windows: mvnw.cmd spring-boot:run
 ```
 
-Sin `GEMINI_API_KEY` funcionan el catálogo, las recetas y la biblioteca; el chat responde con un aviso de que la IA no está configurada.
+| Servicio | URL |
+|---|---|
+| Aplicación (frontend) | http://localhost:8080 |
+| API del backend | http://localhost:8080/api/alimentos |
+| Editor de n8n | http://localhost:5680 |
+| Panel de Qdrant | http://localhost:6333/dashboard |
+
+Detalles: [backend/README.md](backend/README.md) e [IA/README.md](IA/README.md).
 
 ## Estructura del repositorio
 
@@ -59,20 +79,18 @@ IA2/
 ├── frontend/                  Cliente web (ver frontend/README.md)
 │   ├── index.html · pages/    Páginas
 │   ├── css/ · js/             Estilos y módulos ES (api.js centraliza las peticiones)
-│   ├── assets/                Imágenes e íconos
 │   └── tests/                 Pruebas unitarias (node --test)
-└── backend/                   API REST Spring Boot (ver backend/README.md)
-    ├── docker-compose.yml     PostgreSQL 16 + pgvector
-    └── src/main/java/com/nutriguide/
-        ├── config/            CORS, IA, verificación de pgvector, seguridad, carga inicial
-        ├── modules/           alimento · receta · documento · chat
-        │                      (entidad, repositorio, servicio, controlador y DTO de cada uno)
-        ├── rag/               DocumentProcessor → TextChunker → EmbeddingService →
-        │                      VectorRepository → RetrievalService → LlmGenerationService → RagService
-        └── common/            Errores centralizados y utilidades
+├── backend/                   API REST Spring Boot (ver backend/README.md)
+│   ├── docker-compose.yml     PostgreSQL 16 + include de IA (lo levanta Spring al ejecutar)
+│   └── src/main/java/com/nutriguide/
+│       ├── config/            CORS, seguridad, carga inicial
+│       ├── ia/                Cliente de los webhooks de n8n
+│       ├── modules/           alimento · receta · documento · chat
+│       └── common/            Errores centralizados y utilidades
+└── IA/                        Asistente de IA (ver IA/README.md)
+    ├── docker-compose.yml     n8n + Qdrant
+    └── nutriguide-ia.json     Flujo de n8n completo (chat, ingesta, eliminación)
 ```
-
-El backend sigue la arquitectura **modular por responsabilidades** que define el prompt del Desarrollador 2: cada módulo agrupa su controlador, servicio, repositorio, entidad y DTO, y el RAG vive en su propio paquete.
 
 ## Contrato entre frontend y backend
 
@@ -83,7 +101,7 @@ El backend sigue la arquitectura **modular por responsabilidades** que define el
 | GET | `/api/alimentos/buscar?nombre=` | Búsqueda por nombre (sin distinguir tildes) |
 | GET | `/api/recetas` · `/api/recetas/{id}` | Recetas |
 | GET | `/api/documentos` · `/api/documentos/{id}` | Biblioteca |
-| POST | `/api/chat/preguntar` | Pregunta al asistente (RAG) |
+| POST | `/api/chat/preguntar` | Pregunta al asistente (el backend la reenvía al flujo n8n) |
 | POST | `/api/documentos` | Cargar documentos al RAG (requiere `X-Admin-Token`) |
 
 ```json
@@ -97,7 +115,7 @@ El backend sigue la arquitectura **modular por responsabilidades** que define el
   "advertenciaEducativa": "…" }
 ```
 
-Los errores tienen la forma `{"exito": false, "mensaje": "…"}`, y el frontend muestra el `mensaje`. La lista completa de endpoints y códigos HTTP está en [backend/README.md](backend/README.md); los campos que interpreta el frontend, en [frontend/README.md](frontend/README.md).
+Los errores tienen la forma `{"exito": false, "mensaje": "…"}`, y el frontend muestra el `mensaje`. El contrato entre el backend y n8n está en [IA/README.md](IA/README.md).
 
 ## Equipo
 
@@ -106,6 +124,6 @@ Los errores tienen la forma `{"exito": false, "mensaje": "…"}`, y el frontend 
 
 ## Pendiente
 
-- Probar el RAG con una clave real de Gemini y ajustar `RAG_MIN_SIMILARITY` según los resultados.
-- Sustituir o complementar los documentos iniciales (síntesis redactadas por el equipo) por documentos oficiales de FAO, OMS o ICBF cargados con `POST /api/documentos`.
+- Seguir afinando `RAG_MIN_SIMILARITY` (en `IA/.env`) con más preguntas reales a medida que crezca la biblioteca.
+- Sustituir o complementar los documentos iniciales (síntesis redactadas por el equipo) por documentos oficiales de FAO, OMS o ICBF, cargados con `POST /api/documentos`.
 - Revisar las fotografías de los alimentos que no tienen una imagen verificada (hoy muestran una ilustración).
