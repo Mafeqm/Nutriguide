@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Punto de entrada principal del backend de NutriGuide.
- * Plataforma educativa de nutrición con asistencia inteligente basada en arquitectura RAG y pgvector.
+ * Plataforma educativa de nutrición con asistencia inteligente basada en RAG (n8n + Qdrant + Google Gemini).
  */
 @SpringBootApplication
 public class NutriGuideApplication {
