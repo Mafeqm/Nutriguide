@@ -33,5 +33,3 @@ backend/uploads/
 Thumbs.db
 
 
-# Registros del backend al arrancar con iniciar-nutriguide.ps1
-backend/logs/
