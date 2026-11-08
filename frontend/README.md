@@ -10,7 +10,6 @@ También puedes servirlo con cualquier servidor estático mientras desarrollas e
 
 1. La URL del backend está en [js/config.js](js/config.js) (`API_BASE_URL`, por defecto `http://localhost:8080`). Es el único lugar donde aparece.
 2. Si el frontend se publica en otro dominio, añádelo a `CORS_ALLOWED_ORIGINS` del backend.
-3. Si el backend aún no está listo, pon `USE_MOCK_DATA: true` en `config.js`: alimentos, recetas y documentos usarán `js/mock-data.js` (datos de prueba, con un aviso visible). **El chat nunca se simula**; siempre llama a `POST /api/chat/preguntar`.
 
 ## Estructura
 
@@ -19,9 +18,8 @@ frontend/
 ├── index.html                 Dashboard
 ├── pages/                     alimentos, detalle-alimento, recetas, biblioteca, asistente
 ├── css/                       global (tokens + tema oscuro), layout, components, responsive
-├── js/                        módulos ES (sin variables globales, salvo config y mock)
+├── js/                        módulos ES (sin variables globales, salvo config.js)
 │   ├── config.js              (script clásico) URL base y ajustes
-│   ├── mock-data.js           (script clásico) datos de prueba, solo si USE_MOCK_DATA = true
 │   ├── api.js                 TODAS las peticiones HTTP: timeout, cancelación, caché, reintento
 │   ├── normalize.js           funciones puras que adaptan el contrato del backend (testeadas)
 │   ├── richtext.js            parser seguro de texto del asistente (párrafos, listas, negrita)
