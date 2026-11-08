@@ -20,10 +20,9 @@ public record DocumentoResponse(
         EstadoProcesamiento estadoProcesamiento,
         String mensajeError,
         int totalFragmentos,
-        String modeloEmbedding,
         LocalDateTime fechaProcesamiento) {
 
-    public static DocumentoResponse fromEntity(Documento doc, int totalFragmentos, String urlDescarga) {
+    public static DocumentoResponse fromEntity(Documento doc, String urlDescarga) {
         return new DocumentoResponse(
                 doc.getId(),
                 doc.getTitulo(),
@@ -36,8 +35,7 @@ public record DocumentoResponse(
                 doc.getFechaCreacion(),
                 doc.getEstadoProcesamiento(),
                 doc.getMensajeError(),
-                totalFragmentos,
-                doc.getModeloEmbedding(),
+                doc.getTotalFragmentos(),
                 doc.getFechaProcesamiento());
     }
 }
