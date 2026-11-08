@@ -97,49 +97,32 @@ function get(path, opts = {}) {
   return p;
 }
 
-// ---------- Datos de prueba (solo si USE_MOCK_DATA) ----------
-const useMock = () => Boolean(cfg.USE_MOCK_DATA && window.MockData);
-const mockList = (key) => structuredClone(window.MockData[key]);
 const notFound = () => new ApiError(HTTP_MESSAGES[404], 404);
 
 export const Api = {
   async getAlimentos(opts) {
-    return toList(useMock() ? mockList('alimentos') : await get('/api/alimentos', opts)).map(normAlimento);
+    return toList(await get('/api/alimentos', opts)).map(normAlimento);
   },
   async getAlimento(id, opts) {
-    if (useMock()) {
-      const f = mockList('alimentos').find((a) => String(a.id) === String(id));
-      if (!f) throw notFound();
-      return normAlimento(f);
-    }
     const data = await get(`/api/alimentos/${encodeURIComponent(id)}`, opts);
     if (!data) throw notFound();
     return normAlimento(data);
   },
   async buscarAlimentos(nombre, opts) {
-    if (useMock()) {
-      const q = nombre.toLowerCase();
-      return mockList('alimentos').filter((a) => a.nombre.toLowerCase().includes(q)).map(normAlimento);
-    }
     return toList(await get(`/api/alimentos/buscar?nombre=${encodeURIComponent(nombre)}`, opts)).map(normAlimento);
   },
 
   async getRecetas(opts) {
-    return toList(useMock() ? mockList('recetas') : await get('/api/recetas', opts)).map(normReceta);
+    return toList(await get('/api/recetas', opts)).map(normReceta);
   },
   async getReceta(id, opts) {
-    if (useMock()) {
-      const r = mockList('recetas').find((x) => String(x.id) === String(id));
-      if (!r) throw notFound();
-      return normReceta(r);
-    }
     const data = await get(`/api/recetas/${encodeURIComponent(id)}`, opts);
     if (!data) throw notFound();
     return normReceta(data);
   },
 
   async getDocumentos(opts) {
-    return toList(useMock() ? mockList('documentos') : await get('/api/documentos', opts)).map(normDocumento);
+    return toList(await get('/api/documentos', opts)).map(normDocumento);
   },
 
   /** Chat RAG real. Nunca usa datos simulados ni caché, y no se reintenta (no es idempotente). */
