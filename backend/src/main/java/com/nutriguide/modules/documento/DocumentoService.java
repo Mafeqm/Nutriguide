@@ -8,6 +8,7 @@ import com.nutriguide.ia.N8nClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -69,12 +70,20 @@ public class DocumentoService {
         return DocumentoResponse.fromEntity(doc, urlDescarga(doc));
     }
 
-    /** Archivo original para descargar o abrir desde la biblioteca. */
+    /**
+     * Archivo original para descargar o abrir desde la biblioteca. Si ya no está en disco (otra carpeta
+     * de subidas, proyecto movido o carpeta borrada), se entrega el texto guardado en PostgreSQL.
+     */
     public ArchivoDocumento archivo(Long id) {
         Documento doc = buscar(id);
         Path ruta = Paths.get(doc.getRutaArchivo()).toAbsolutePath().normalize();
         if (!ruta.startsWith(directorio) || !Files.isRegularFile(ruta)) {
-            throw new ResourceNotFoundException("El archivo original del documento " + id + " no está disponible.");
+            if (doc.getContenidoTexto() == null || doc.getContenidoTexto().isBlank()) {
+                throw new ResourceNotFoundException("El archivo original del documento " + id + " no está disponible.");
+            }
+            String nombreTxt = doc.getNombreArchivo().replaceFirst("\\.[A-Za-z0-9]+$", "") + ".txt";
+            return new ArchivoDocumento(new ByteArrayResource(doc.getContenidoTexto().getBytes(StandardCharsets.UTF_8)),
+                    nombreTxt, "text/plain;charset=UTF-8");
         }
         String tipo = "pdf".equals(documentProcessor.obtenerExtension(doc.getNombreArchivo()))
                 ? "application/pdf" : "text/plain;charset=UTF-8";
