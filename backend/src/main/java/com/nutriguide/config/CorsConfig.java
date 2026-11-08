@@ -11,27 +11,25 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Configuración de CORS para permitir la comunicación con el frontend (HTML, CSS y JS puro).
+ * CORS para el frontend (HTML, CSS y JavaScript puro).
+ * Los orígenes permitidos se configuran con CORS_ALLOWED_ORIGINS (separados por comas).
  */
 @Configuration
 public class CorsConfig {
 
-    @Value("${nutriguide.cors.allowed-origins:*}")
+    @Value("${nutriguide.cors.allowed-origins:http://localhost:[*],http://127.0.0.1:[*]}")
     private String allowedOrigins;
 
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        if ("*".equals(allowedOrigins.trim())) {
-            config.addAllowedOriginPattern("*");
-        } else {
-            Arrays.stream(allowedOrigins.split(","))
-                    .map(String::trim)
-                    .forEach(config::addAllowedOriginPattern);
-        }
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setExposedHeaders(List.of("Content-Disposition", "Content-Type"));
+        Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .forEach(config::addAllowedOriginPattern);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Content-Type", "Accept", AdminTokenInterceptor.HEADER));
+        config.setExposedHeaders(List.of("Content-Disposition"));
         config.setAllowCredentials(false);
         config.setMaxAge(3600L);
 
@@ -40,4 +38,3 @@ public class CorsConfig {
         return new CorsFilter(source);
     }
 }
-
