@@ -1,22 +1,22 @@
 package com.nutriguide.modules.chat;
 
-import com.nutriguide.rag.RagService;
+import com.nutriguide.ia.N8nClient;
 import org.springframework.stereotype.Service;
 
 /**
- * Servicio del módulo de chat que delega la consulta del usuario al flujo RAG verificable.
+ * Delega la pregunta al flujo RAG de n8n (Qdrant + Gemini) y devuelve la respuesta con sus fuentes.
+ * El frontend sigue usando POST /api/chat/preguntar sin conocer n8n.
  */
 @Service
 public class ChatService {
 
-    private final RagService ragService;
+    private final N8nClient n8nClient;
 
-    public ChatService(RagService ragService) {
-        this.ragService = ragService;
+    public ChatService(N8nClient n8nClient) {
+        this.n8nClient = n8nClient;
     }
 
     public ChatResponse preguntar(ChatRequest request) {
-        return ragService.responderPregunta(request.getPregunta().trim());
+        return n8nClient.preguntar(request.getPregunta().trim());
     }
 }
-
