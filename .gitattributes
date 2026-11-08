@@ -1,0 +1,6 @@
+# Saltos de línea correctos en cualquier sistema operativo:
+# los scripts de shell (incluido el Maven Wrapper) deben tener LF para funcionar en Linux, macOS y contenedores.
+*.sh text eol=lf
+IA/nutriguide-ia.json text eol=lf
+backend/mvnw text eol=lf
+*.cmd text eol=crlf
