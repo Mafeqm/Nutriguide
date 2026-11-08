@@ -4,11 +4,7 @@ import com.nutriguide.common.AiServiceException;
 import com.nutriguide.common.DocumentProcessingException;
 import com.nutriguide.common.DuplicateDocumentException;
 import com.nutriguide.common.ResourceNotFoundException;
-import com.nutriguide.config.AiConfig;
-import com.nutriguide.rag.DocumentProcessor;
-import com.nutriguide.rag.RagService;
-import com.nutriguide.rag.VectorRepository;
-import com.nutriguide.rag.VectorRepository.FragmentoAlmacenado;
+import com.nutriguide.ia.N8nClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,17 +22,14 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
 
 /**
- * Ciclo de vida de los documentos de la biblioteca RAG:
- * validación → control de duplicados (SHA-256 y título) → almacenamiento → extracción y limpieza
- * del texto → fragmentación y embeddings (RagService) → estado de procesamiento.
+ * Ciclo de vida de los documentos de la biblioteca:
+ * validación → control de duplicados (SHA-256 y título) → almacenamiento del archivo y del texto en
+ * PostgreSQL → indexación en Qdrant mediante el flujo n8n (fragmentos + embeddings) → estado.
  * <p>
- * El documento solo se registra si su texto se pudo extraer. Si la indexación falla (por ejemplo,
- * falta la clave de IA o se agotó la cuota), queda registrado como PENDIENTE o ERROR con el motivo,
- * y puede reprocesarse después sin volver a subirlo.
+ * Si la indexación no es posible (n8n detenido, sin clave de IA, cuota agotada) el documento queda
+ * registrado como PENDIENTE o ERROR con el motivo y puede reprocesarse sin volver a subirlo.
  */
 @Service
 public class DocumentoService {
@@ -45,19 +38,15 @@ public class DocumentoService {
 
     private final DocumentoRepository documentoRepository;
     private final DocumentProcessor documentProcessor;
-    private final RagService ragService;
-    private final VectorRepository vectorRepository;
-    private final AiConfig aiConfig;
+    private final N8nClient n8nClient;
     private final Path directorio;
 
     public DocumentoService(DocumentoRepository documentoRepository, DocumentProcessor documentProcessor,
-                            RagService ragService, VectorRepository vectorRepository, AiConfig aiConfig,
+                            N8nClient n8nClient,
                             @Value("${nutriguide.storage.upload-dir:./uploads/documentos}") String uploadDir) {
         this.documentoRepository = documentoRepository;
         this.documentProcessor = documentProcessor;
-        this.ragService = ragService;
-        this.vectorRepository = vectorRepository;
-        this.aiConfig = aiConfig;
+        this.n8nClient = n8nClient;
         this.directorio = Paths.get(uploadDir).toAbsolutePath().normalize();
     }
 
@@ -72,20 +61,12 @@ public class DocumentoService {
         } else {
             documentos = documentoRepository.findAllByOrderByFechaCreacionDesc();
         }
-        Map<Long, Integer> fragmentos = vectorRepository.contarPorDocumento();
-        return documentos.stream()
-                .map(d -> DocumentoResponse.fromEntity(d, fragmentos.getOrDefault(d.getId(), 0), urlDescarga(d)))
-                .toList();
+        return documentos.stream().map(d -> DocumentoResponse.fromEntity(d, urlDescarga(d))).toList();
     }
 
     public DocumentoResponse obtener(Long id) {
         Documento doc = buscar(id);
-        return DocumentoResponse.fromEntity(doc, vectorRepository.contarPorDocumento(id), urlDescarga(doc));
-    }
-
-    public List<FragmentoAlmacenado> listarFragmentos(Long id) {
-        buscar(id);
-        return vectorRepository.listarPorDocumento(id);
+        return DocumentoResponse.fromEntity(doc, urlDescarga(doc));
     }
 
     /** Archivo original para descargar o abrir desde la biblioteca. */
@@ -115,8 +96,7 @@ public class DocumentoService {
         String extension = documentProcessor.obtenerExtension(nombre);
         String tituloFinal = textoONulo(titulo) != null ? titulo.trim() : nombre;
         return registrar(bytes, extension, nombre, tituloFinal, descripcion,
-                textoONulo(categoria) != null ? categoria.trim() : "Nutrición general",
-                fuenteOrigen);
+                textoONulo(categoria) != null ? categoria.trim() : "Nutrición general", fuenteOrigen);
     }
 
     public DocumentoResponse cargarTexto(DocumentoTextoRequest request) {
@@ -158,58 +138,52 @@ public class DocumentoService {
         return indexar(doc, false);
     }
 
-    // ------------------------------------------------------------------ indexación
+    // ------------------------------------------------------------------ indexación (n8n + Qdrant)
 
     public DocumentoResponse reprocesar(Long id) {
         return indexar(buscar(id), true);
     }
 
-    /**
-     * Indexa (o reindexa) los documentos que lo necesitan: PENDIENTES, con ERROR o indexados con
-     * otro modelo de embeddings. Solo actúa si la IA está configurada.
-     */
+    /** Indexa los documentos PENDIENTES o con ERROR. Solo actúa si el servicio de IA está configurado. */
     public List<DocumentoResponse> reprocesarPendientes() {
-        if (!aiConfig.hasValidApiKey()) {
+        if (!n8nClient.estaConfigurado()) {
             return List.of();
         }
         return documentoRepository.findAll().stream()
-                .filter(this::requiereIndexacion)
-                .map(doc -> indexar(doc, false))
+                .filter(d -> d.getEstadoProcesamiento() != EstadoProcesamiento.PROCESADO)
+                .map(d -> indexar(d, false))
                 .toList();
     }
 
-    public boolean requiereIndexacion(Documento doc) {
-        return doc.getEstadoProcesamiento() != EstadoProcesamiento.PROCESADO
-                || !Objects.equals(doc.getModeloEmbedding(), modeloActual());
-    }
-
     /**
-     * @param lanzarError si es true, un fallo se propaga como excepción HTTP; si es false, el fallo
-     *                    queda registrado en el estado del documento y se devuelve el documento.
+     * @param lanzarError si es true, un fallo se propaga como error HTTP; si es false, queda registrado
+     *                    en el estado del documento y se devuelve el documento.
      */
     private DocumentoResponse indexar(Documento doc, boolean lanzarError) {
-        if (!aiConfig.hasValidApiKey()) {
+        if (!n8nClient.estaConfigurado()) {
             doc.setEstadoProcesamiento(EstadoProcesamiento.PENDIENTE);
-            doc.setMensajeError("Pendiente de indexar: el servidor no tiene configurada GEMINI_API_KEY.");
+            doc.setMensajeError("Pendiente de indexar: el servidor no tiene configurado el servicio de IA (N8N_WEBHOOK_TOKEN).");
             doc = documentoRepository.save(doc);
             if (lanzarError) {
                 throw new AiServiceException(doc.getMensajeError(), 503);
             }
-            return DocumentoResponse.fromEntity(doc, vectorRepository.contarPorDocumento(doc.getId()), urlDescarga(doc));
+            return DocumentoResponse.fromEntity(doc, urlDescarga(doc));
         }
 
         doc.setEstadoProcesamiento(EstadoProcesamiento.PROCESANDO);
         doc.setMensajeError(null);
         doc = documentoRepository.save(doc);
         try {
-            String texto = doc.getContenidoTexto() != null ? doc.getContenidoTexto() : releerTexto(doc);
-            int fragmentos = ragService.indexarDocumento(doc.getId(), doc.getTitulo(), texto);
-            doc.setContenidoTexto(texto);
+            if (doc.getContenidoTexto() == null) {
+                doc.setContenidoTexto(releerTexto(doc));
+            }
+            int fragmentos = n8nClient.indexar(doc);
+            doc.setTotalFragmentos(fragmentos);
             doc.setEstadoProcesamiento(EstadoProcesamiento.PROCESADO);
-            doc.setModeloEmbedding(modeloActual());
             doc.setFechaProcesamiento(LocalDateTime.now());
             doc = documentoRepository.save(doc);
-            return DocumentoResponse.fromEntity(doc, fragmentos, urlDescarga(doc));
+            log.info("Documento '{}' (ID={}) indexado en Qdrant con {} fragmentos.", doc.getTitulo(), doc.getId(), fragmentos);
+            return DocumentoResponse.fromEntity(doc, urlDescarga(doc));
         } catch (RuntimeException ex) {
             log.error("No se pudo indexar el documento '{}' (ID={}): {}", doc.getTitulo(), doc.getId(), ex.getMessage());
             doc.setEstadoProcesamiento(EstadoProcesamiento.ERROR);
@@ -218,7 +192,7 @@ public class DocumentoService {
             if (lanzarError) {
                 throw ex;
             }
-            return DocumentoResponse.fromEntity(doc, vectorRepository.contarPorDocumento(doc.getId()), urlDescarga(doc));
+            return DocumentoResponse.fromEntity(doc, urlDescarga(doc));
         }
     }
 
@@ -233,9 +207,16 @@ public class DocumentoService {
 
     // ------------------------------------------------------------------ borrado
 
+    /**
+     * Borra primero los fragmentos en Qdrant (para que el asistente no cite un documento eliminado)
+     * y después el registro y el archivo. Si nunca se indexó, no hace falta llamar a n8n.
+     */
     public void eliminar(Long id) {
         Documento doc = buscar(id);
-        documentoRepository.delete(doc); // los fragmentos se borran en cascada (ON DELETE CASCADE)
+        if (doc.getTotalFragmentos() > 0 || doc.getEstadoProcesamiento() == EstadoProcesamiento.PROCESADO) {
+            n8nClient.eliminar(id);
+        }
+        documentoRepository.delete(doc);
         try {
             Path ruta = Paths.get(doc.getRutaArchivo()).toAbsolutePath().normalize();
             if (ruta.startsWith(directorio)) {
@@ -251,10 +232,6 @@ public class DocumentoService {
     private Documento buscar(Long id) {
         return documentoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró el documento con ID: " + id));
-    }
-
-    private String modeloActual() {
-        return aiConfig.getEmbeddingModel() + "@" + aiConfig.getEmbeddingDimension();
     }
 
     private String urlDescarga(Documento doc) {
