@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * DTO de salida del asistente inteligente basado en RAG, incluyendo la respuesta generada
- * y la lista de fuentes documentales recuperadas desde pgvector.
+ * y la lista de fuentes documentales recuperadas de Qdrant por el flujo n8n.
  */
 public class ChatResponse {
 
@@ -60,7 +60,7 @@ public class ChatResponse {
     }
 
     /**
-     * Representa una fuente documental verificada recuperada desde pgvector.
+     * Representa una fuente documental verificada recuperada de Qdrant por el flujo n8n.
      */
     public static class FuenteResponse {
         private String titulo;
