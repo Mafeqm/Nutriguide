@@ -4,12 +4,12 @@
  */
 window.MockData = {
   alimentos: [
-    { id: 1, nombre: 'Avena', categoria: 'Cereales', descripcion: 'Cereal integral rico en fibra soluble (beta-glucanos).', calorias: 389, proteinas: 16.9, carbohidratos: 66.3, grasas: 6.9, fibra: 10.6, tamanoPorcion: 100, unidadPorcion: 'g', fuente: 'Dato de prueba' },
+    { id: 1, nombre: 'Avena', categoria: 'Cereales y Tubérculos', descripcion: 'Cereal integral rico en fibra soluble (beta-glucanos).', calorias: 389, proteinas: 16.9, carbohidratos: 66.3, grasas: 6.9, fibra: 10.6, tamanoPorcion: 100, unidadPorcion: 'g', fuente: 'Dato de prueba' },
     { id: 2, nombre: 'Manzana', categoria: 'Frutas', descripcion: 'Fruta con fibra y vitamina C.', calorias: 52, proteinas: 0.3, carbohidratos: 13.8, grasas: 0.2, fibra: 2.4, tamanoPorcion: 100, unidadPorcion: 'g', fuente: 'Dato de prueba' },
-    { id: 3, nombre: 'Lentejas', categoria: 'Legumbres', descripcion: 'Legumbre con alto contenido de proteína vegetal y hierro.', calorias: 116, proteinas: 9, carbohidratos: 20, grasas: 0.4, fibra: 7.9, tamanoPorcion: 100, unidadPorcion: 'g', fuente: 'Dato de prueba' },
-    { id: 4, nombre: 'Pechuga de pollo', categoria: 'Carnes', descripcion: 'Fuente de proteína magra.', calorias: 165, proteinas: 31, carbohidratos: 0, grasas: 3.6, fibra: 0, tamanoPorcion: 100, unidadPorcion: 'g', fuente: 'Dato de prueba' },
-    { id: 5, nombre: 'Brócoli', categoria: 'Verduras', descripcion: 'Verdura crucífera con vitamina C y K.', calorias: 34, proteinas: 2.8, carbohidratos: 6.6, grasas: 0.4, fibra: 2.6, tamanoPorcion: 100, unidadPorcion: 'g', fuente: 'Dato de prueba' },
-    { id: 6, nombre: 'Arroz integral', categoria: 'Cereales', descripcion: 'Grano entero con más fibra que el arroz blanco.', calorias: 111, proteinas: 2.6, carbohidratos: 23, grasas: 0.9, fibra: 1.8, tamanoPorcion: 100, unidadPorcion: 'g', fuente: 'Dato de prueba' },
+    { id: 3, nombre: 'Lentejas', categoria: 'Leguminosas', descripcion: 'Legumbre con alto contenido de proteína vegetal y hierro.', calorias: 116, proteinas: 9, carbohidratos: 20, grasas: 0.4, fibra: 7.9, tamanoPorcion: 100, unidadPorcion: 'g', fuente: 'Dato de prueba' },
+    { id: 4, nombre: 'Pechuga de pollo', categoria: 'Proteínas Animales', descripcion: 'Fuente de proteína magra.', calorias: 165, proteinas: 31, carbohidratos: 0, grasas: 3.6, fibra: 0, tamanoPorcion: 100, unidadPorcion: 'g', fuente: 'Dato de prueba' },
+    { id: 5, nombre: 'Brócoli', categoria: 'Verduras y Hortalizas', descripcion: 'Verdura crucífera con vitamina C y K.', calorias: 34, proteinas: 2.8, carbohidratos: 6.6, grasas: 0.4, fibra: 2.6, tamanoPorcion: 100, unidadPorcion: 'g', fuente: 'Dato de prueba' },
+    { id: 6, nombre: 'Arroz integral', categoria: 'Cereales y Tubérculos', descripcion: 'Grano entero con más fibra que el arroz blanco.', calorias: 111, proteinas: 2.6, carbohidratos: 23, grasas: 0.9, fibra: 1.8, tamanoPorcion: 100, unidadPorcion: 'g', fuente: 'Dato de prueba' },
   ],
   recetas: [
     { id: 1, nombre: 'Avena con manzana', categoria: 'Desayunos', tiempoPreparacion: '10 min', descripcion: 'Desayuno sencillo y saciante.', ingredientes: ['1/2 taza de avena', '1 taza de agua o leche', '1 manzana picada', 'Canela al gusto'], pasos: ['Cocina la avena con el líquido a fuego medio 5 minutos.', 'Agrega la manzana picada y la canela.', 'Sirve caliente.'], calorias: 280, proteinas: 9, carbohidratos: 48, grasas: 5, fibra: 7 },
