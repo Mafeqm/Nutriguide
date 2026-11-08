@@ -133,7 +133,6 @@ input:focus, textarea:focus { border-color: var(--green-600); outline: none; box
   --rb-max: .5;
 }
 :root[data-theme="dark"] .badge--warm { color: #ffb783; }
-:root[data-theme="dark"] .mock-banner { color: #ffcfa5; }
 :root[data-theme="dark"] .hero { background: radial-gradient(circle at 90% 10%, rgba(42, 138, 92, .28), transparent 45%), radial-gradient(circle at 5% 90%, rgba(232, 131, 58, .1), transparent 40%); }
 :root[data-theme="dark"] .nav__link:hover { background: var(--green-100); }
 
