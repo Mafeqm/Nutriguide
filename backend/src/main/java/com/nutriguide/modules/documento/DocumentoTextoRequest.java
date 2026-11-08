@@ -13,6 +13,7 @@ public class DocumentoTextoRequest {
     @Size(max = 255, message = "El título no puede superar los 255 caracteres")
     private String titulo;
 
+    @Size(max = 2000, message = "La descripción no puede superar los 2000 caracteres")
     private String descripcion;
 
     @NotBlank(message = "La categoría del documento es obligatoria")
@@ -20,10 +21,11 @@ public class DocumentoTextoRequest {
     private String categoria;
 
     @JsonAlias({"fuente_origen"})
+    @Size(max = 255, message = "La fuente no puede superar los 255 caracteres")
     private String fuenteOrigen;
 
     @NotBlank(message = "El contenido del documento educativo es obligatorio")
-    @Size(min = 30, message = "El contenido del documento debe tener al menos 30 caracteres")
+    @Size(min = 30, max = 2_000_000, message = "El contenido debe tener entre 30 y 2.000.000 caracteres")
     private String contenido;
 
     public DocumentoTextoRequest() {
