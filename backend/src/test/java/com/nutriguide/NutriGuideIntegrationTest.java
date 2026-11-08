@@ -112,6 +112,23 @@ class NutriGuideIntegrationTest {
     }
 
     @Test
+    @Order(2)
+    void elBotonAbrirDocumentoFuncionaAunqueFalteElArchivoEnDisco() throws Exception {
+        long id = jdbc.queryForObject("SELECT MIN(id) FROM documentos", Long.class);
+        mvc.perform(get("/api/documentos/{id}/archivo", id))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN));
+
+        // Simula un proyecto movido o una carpeta de subidas distinta
+        jdbc.update("UPDATE documentos SET ruta_archivo = '/ruta/que/no/existe/doc.txt' WHERE id = ?", id);
+        String contenido = jdbc.queryForObject("SELECT contenido_texto FROM documentos WHERE id = ?", String.class, id);
+        mvc.perform(get("/api/documentos/{id}/archivo", id))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+                .andExpect(content().string(contenido));
+    }
+
+    @Test
     @Order(3)
     void alimentosYRecetasSalenDePostgresql() throws Exception {
         mvc.perform(get("/api/alimentos"))
