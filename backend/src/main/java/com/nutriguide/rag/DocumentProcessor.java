@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -72,7 +75,7 @@ public class DocumentProcessor {
         if ("pdf".equals(ext)) {
             textoCrudo = extraerTextoDePdf(bytes);
         } else if ("txt".equals(ext)) {
-            textoCrudo = new String(bytes, StandardCharsets.UTF_8);
+            textoCrudo = decodificarTextoPlano(bytes);
         } else {
             throw new DocumentProcessingException("Extensión no soportada: " + extension);
         }
@@ -83,6 +86,28 @@ public class DocumentProcessor {
                     "El documento no contiene suficiente texto legible para ser procesado en el sistema RAG.");
         }
         return textoLimpio;
+    }
+
+    /**
+     * Un .txt debe ser texto UTF-8 válido: se rechazan binarios renombrados (bytes nulos o
+     * secuencias UTF-8 inválidas) para no indexar contenido corrupto o peligroso.
+     */
+    private String decodificarTextoPlano(byte[] bytes) {
+        for (byte b : bytes) {
+            if (b == 0) {
+                throw new DocumentProcessingException("El archivo .txt contiene datos binarios; no es un texto válido.");
+            }
+        }
+        try {
+            String texto = StandardCharsets.UTF_8.newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT)
+                    .decode(ByteBuffer.wrap(bytes))
+                    .toString();
+            return texto.startsWith("﻿") ? texto.substring(1) : texto;
+        } catch (CharacterCodingException ex) {
+            throw new DocumentProcessingException("El archivo .txt debe estar codificado en UTF-8.");
+        }
     }
 
     private String extraerTextoDePdf(byte[] pdfBytes) {
