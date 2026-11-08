@@ -16,8 +16,6 @@ public interface DocumentoRepository extends JpaRepository<Documento, Long> {
 
     Optional<Documento> findByTituloIgnoreCase(String titulo);
 
-    Optional<Documento> findByNombreArchivoIgnoreCase(String nombreArchivo);
-
     List<Documento> findByEstadoProcesamientoOrderByFechaCreacionAsc(EstadoProcesamiento estado);
 
     List<Documento> findByCategoriaIgnoreCaseOrderByFechaCreacionDesc(String categoria);
