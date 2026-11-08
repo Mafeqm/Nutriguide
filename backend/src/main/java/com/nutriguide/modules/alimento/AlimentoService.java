@@ -1,5 +1,6 @@
 package com.nutriguide.modules.alimento;
 
+import com.nutriguide.common.BusquedaTexto;
 import com.nutriguide.common.DuplicateDocumentException;
 import com.nutriguide.common.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class AlimentoService {
         if (nombre == null || nombre.isBlank()) {
             return listarTodos(null);
         }
-        return alimentoRepository.findByNombreContainingIgnoreCaseOrderByNombreAsc(nombre.trim())
+        return alimentoRepository.buscarPorNombre(BusquedaTexto.patronLike(nombre))
                 .stream()
                 .map(AlimentoResponse::fromEntity)
                 .toList();
