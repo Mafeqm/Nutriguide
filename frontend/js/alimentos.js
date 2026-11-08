@@ -74,7 +74,10 @@ async function initCatalog(grid) {
   try {
     all = await Api.getAlimentos();
     current = all;
-    UI.categoryChips(chips, UI.uniqueCategories(all), (c) => { category = c; render(); }, category);
+    const categorias = UI.uniqueCategories(all);
+    // La categoría de la URL se busca sin distinguir mayúsculas ni tildes
+    category = categorias.find((c) => UI.norm(c) === UI.norm(category)) || category;
+    UI.categoryChips(chips, categorias, (c) => { category = c; render(); }, category);
   } catch (e) { return UI.error(grid, e, () => initCatalog(grid)); }
   await search(); // aplica la búsqueda inicial de la URL (o renderiza todo)
 
