@@ -22,7 +22,7 @@ function el(tag, props = {}, ...children) {
     else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
     else n.setAttribute(k, v === true ? '' : v);
   }
-  for (const c of children.flat()) {
+  for (const c of children.flat(Infinity)) {
     if (c === null || c === undefined || c === false) continue;
     n.append(c.nodeType ? c : document.createTextNode(String(c)));
   }
