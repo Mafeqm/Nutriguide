@@ -1,11 +1,25 @@
-# PostgreSQL 16 con la extensión pgvector para NutriGuide.
-# El esquema y los datos iniciales los crea el backend al arrancar (src/main/resources/db).
+# =============================================================================
+# Infraestructura de NutriGuide para desarrollo.
+#
+# Spring Boot la levanta SOLA al ejecutar la aplicación desde IntelliJ (o con
+# ./mvnw spring-boot:run) gracias a spring-boot-docker-compose: PostgreSQL y, a
+# través del include, n8n + Qdrant de la carpeta IA. Solo hace falta tener Docker abierto.
+#
+# También se puede usar a mano:  docker compose up -d   (desde esta carpeta)
+# =============================================================================
 name: nutriguide
+
+# Asistente de IA (n8n + Qdrant). Usa sus propias variables de IA/.env.
+include:
+  - ../IA/docker-compose.yml
 
 services:
   nutriguide-postgres:
+    # PostgreSQL 16 oficial con la librería pgvector incluida. NutriGuide ya no guarda vectores aquí
+    # (están en Qdrant), pero la librería es necesaria para limpiar sin errores las bases creadas por
+    # la versión anterior, que sí usaban pgvector.
     image: pgvector/pgvector:pg16
-    container_name: nutriguide-pgvector
+    container_name: nutriguide-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME:-nutriguide_db}
@@ -14,7 +28,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-nutriguide_dev_pass}
     ports:
       # Puerto 5434 del host para no chocar con un PostgreSQL local en 5432
-      - "${DB_PORT:-5434}:5432"
+      - "127.0.0.1:${DB_PORT:-5434}:5432"
     volumes:
       - nutriguide_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -25,3 +39,4 @@ services:
 
 volumes:
   nutriguide_pgdata:
+    name: nutriguide_nutriguide_pgdata
