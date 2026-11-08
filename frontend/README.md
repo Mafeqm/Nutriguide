@@ -68,7 +68,7 @@ Si `respuesta` viene vacía se muestra un error; si `fuentes` está vacío se in
 `api.js` normaliza estos nombres (acepta también algunas variantes, ver `normNutricion`, `normReceta`, `normDocumento`):
 
 - **Alimento**: `id, nombre, categoria (texto u objeto {nombre}), descripcion, imagenUrl, calorias, proteinas, carbohidratos, grasas, fibra, tamanoPorcion, unidadPorcion, fuente, otrosNutrientes` (arreglo `[{nombre, valor, unidad}]` u objeto `{nombre: valor}`). Los valores nutricionales pueden venir anidados en `informacionNutricional`.
-- **Receta**: `id, nombre, categoria, descripcion, imagenUrl, tiempoPreparacion, ingredientes` (arreglo de textos u objetos `{nombre, cantidad, unidad}`), `preparacion` o `pasos` (arreglo o texto con saltos de línea) y los mismos campos nutricionales.
+- **Receta**: `id, nombre, categoria, descripcion, imagenUrl, tiempoPreparacion` (minutos; se muestra como «N min»), `ingredientes` (arreglo de textos u objetos `{nombre, cantidad, unidad}`), `preparacion` o `pasos` (arreglo o texto con saltos de línea) y los campos nutricionales, que el backend envía agrupados en `informacionNutricional` (valores por porción servida; `null` si no se conocen).
 - **Documento**: `id, titulo, descripcion, categoria, contenido, url`.
 
 Cualquier cambio de contrato se concentra en las funciones de normalización de `api.js`.
